@@ -139,13 +139,6 @@
     </div>
   </header>
 
-  <div class="setup-box" id="setup-box">
-    <b>One-time setup:</b> paste your published CSV URL below (File → Share → Publish to web, select the <code>Stage_Summary</code> tab specifically, format <code>Comma-separated values (.csv)</code>).
-    <input type="text" id="url-input" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?gid=...&single=true&output=csv" />
-    <div style="margin-top:12px;">Also publish <code>Raw_Contracts</code> the same way (needed to list which specific contracts are missing data — Stage_Summary only has counts, not names):</div>
-    <input type="text" id="raw-url-input" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?gid=...&single=true&output=csv (Raw_Contracts)" />
-  </div>
-
   <div class="status-bar">
     <div class="status-dot" id="status-dot"></div>
     <div class="status-text" id="status-text">Not connected yet — paste your published CSV URL above.</div>
@@ -187,8 +180,6 @@ const DEFAULT_STAGE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5p3
 const DEFAULT_RAW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5p3_GYBrPG_-skbMKvJA2MLYWvokTjWMI4P_gDrCbzsp3QTmSezrLoo2uFP9GraJdJ2XBF7oO9-J2/pub?gid=2028906285&single=true&output=csv";
 const statusDot = document.getElementById('status-dot');
 const statusText = document.getElementById('status-text');
-const urlInput = document.getElementById('url-input');
-const rawUrlInput = document.getElementById('raw-url-input');
 const pullTimeEl = document.getElementById('pull-time');
 const refreshBtn = document.getElementById('refresh-btn');
 
@@ -244,10 +235,6 @@ function getStoredUrl(){ return localStorage.getItem(STORAGE_KEY) || DEFAULT_STA
 function setStoredUrl(url){ localStorage.setItem(STORAGE_KEY, url); }
 function getStoredRawUrl(){ return localStorage.getItem(RAW_STORAGE_KEY) || DEFAULT_RAW_URL; }
 function setStoredRawUrl(url){ localStorage.setItem(RAW_STORAGE_KEY, url); }
-urlInput.value = getStoredUrl();
-rawUrlInput.value = getStoredRawUrl();
-urlInput.addEventListener('change', () => { setStoredUrl(urlInput.value.trim()); loadData(); });
-rawUrlInput.addEventListener('change', () => { setStoredRawUrl(rawUrlInput.value.trim()); loadMissingData(); });
 
 function setStatus(state, text){
   statusDot.className = 'status-dot' + (state ? ' ' + state : '');
