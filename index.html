@@ -178,6 +178,13 @@
 <script>
 const STORAGE_KEY = 'suresend_csv_url';
 const RAW_STORAGE_KEY = 'suresend_raw_contracts_csv_url';
+
+// Baked in as defaults — these are already public "anyone with the link" URLs
+// (that's what Publish to web means), so hardcoding them here adds no new exposure
+// beyond what already exists. localStorage still overrides these if you ever
+// change which sheet you're pointing at.
+const DEFAULT_STAGE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5p3_GYBrPG_-skbMKvJA2MLYWvokTjWMI4P_gDrCbzsp3QTmSezrLoo2uFP9GraJdJ2XBF7oO9-J2/pub?gid=1715969638&single=true&output=csv";
+const DEFAULT_RAW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5p3_GYBrPG_-skbMKvJA2MLYWvokTjWMI4P_gDrCbzsp3QTmSezrLoo2uFP9GraJdJ2XBF7oO9-J2/pub?gid=2028906285&single=true&output=csv";
 const statusDot = document.getElementById('status-dot');
 const statusText = document.getElementById('status-text');
 const urlInput = document.getElementById('url-input');
@@ -233,9 +240,9 @@ function filterAndSort(rows, orderList, key){
   return known;
 }
 
-function getStoredUrl(){ return localStorage.getItem(STORAGE_KEY) || ''; }
+function getStoredUrl(){ return localStorage.getItem(STORAGE_KEY) || DEFAULT_STAGE_URL; }
 function setStoredUrl(url){ localStorage.setItem(STORAGE_KEY, url); }
-function getStoredRawUrl(){ return localStorage.getItem(RAW_STORAGE_KEY) || ''; }
+function getStoredRawUrl(){ return localStorage.getItem(RAW_STORAGE_KEY) || DEFAULT_RAW_URL; }
 function setStoredRawUrl(url){ localStorage.setItem(RAW_STORAGE_KEY, url); }
 urlInput.value = getStoredUrl();
 rawUrlInput.value = getStoredRawUrl();
