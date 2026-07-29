@@ -134,14 +134,14 @@
   <header style="flex-direction:column; align-items:flex-start; gap:16px;">
     <img id="site-logo" src="logo.png" alt="The Steel Group" style="height:90px; width:auto; object-fit:contain;" onerror="this.style.display='none'">
     <div>
-      <div class="eyebrow">The Steel Group · SureSend Tier 1 Pull</div>
+      <div class="eyebrow">The Steel Group</div>
       <h1>Live Pipeline Dashboard</h1>
     </div>
   </header>
 
   <div class="status-bar">
     <div class="status-dot" id="status-dot"></div>
-    <div class="status-text" id="status-text">Not connected yet — paste your published CSV URL above.</div>
+    <div class="status-text" id="status-text"></div>
     <button class="refresh-btn" id="refresh-btn">Refresh now</button>
   </div>
 
@@ -163,7 +163,7 @@
   <div id="missing-data-table"></div>
 
   <footer>
-    <span>THE STEEL GROUP · SureSend CRM (live via published Sheet CSV)</span>
+    <span>THE STEEL GROUP · SureSend CRM</span>
     <span id="pull-time"></span>
   </footer>
 </div>
@@ -191,6 +191,7 @@ const fmtInt = n => (n === '' || n === null || n === undefined || isNaN(n)) ? 0 
 // not a claim about pipeline sequence.
 const PALETTE = ["#C24B3F", "#D98A2B", "#C9A227", "#4B8A5E", "#3A6EA5", "#6B5B95", "#B4863E", "#8A6FA8"];
 let avgRateGlobal = 0;
+let estimatedStageNamesGlobal = new Set();
 
 // Best-effort canonical ordering for readability — stages not in this list keep
 // whatever order the CSV returned them in, appended after known ones.
@@ -324,27 +325,31 @@ async function loadData(){
     // Apply the dynamic estimate to the earliest pipeline stages (A, B, C) only when
     // they have no real commission entered yet — by CRM design, commission isn't
     // entered until later stages, so this fills the gap with a computed rate rather
-    // than showing $0.
+    // than showing $0. Track which stage names got the estimate so the Missing Data
+    // list below can skip flagging contracts in those stages as missing commission —
+    // that's expected there, not a real gap.
+    estimatedStageNamesGlobal = new Set();
     contracts.forEach((s, i) => {
       const realGci = fmtInt(s.gci) ? parseFloat(s.gci) : 0;
       if (i < 3 && s.stage !== 'Closed (YTD)' && realGci === 0 && avgRate > 0) {
         const val = fmtInt(s.value) ? parseFloat(s.value) : 0;
         s.gci = Math.round(val * avgRate * 100) / 100;
         s.estimated = true;
+        estimatedStageNamesGlobal.add(s.stage);
       }
     });
 
     renderPeopleFunnel(people);
     renderContractFunnel(contracts);
     renderAllTimeClosed(allTimeClosed, avgRate);
+    await loadMissingData();
 
     const totalLeads = totalLeadsAll;
     renderLeadStats(totalLeads, metsRow ? fmtInt(metsRow.count) : 0, nurtureRow ? fmtInt(nurtureRow.count) : 0);
 
-    pullTimeEl.textContent = 'Loaded ' + dataRows.length + ' stage rows from published CSV.';
-    setStatus('ok', `<b>Connected.</b> Reading the published <code>Stage_Summary</code> CSV — reflects the last hourly pull, not this exact second. This does not call SureSend directly.`);
+    setStatus('ok', '');
   } catch (err) {
-    setStatus('err', `<b>Fetch failed:</b> ${err.message}. Confirm you published the <b>Stage_Summary</b> tab specifically (not the whole workbook) as <b>CSV</b> format, and that the URL ends in <code>output=csv</code>.`);
+    setStatus('err', '');
     renderPeopleFunnel([]);
     renderContractFunnel([]);
     renderAllTimeClosed(null, 0);
@@ -521,11 +526,15 @@ async function loadMissingData(){
     const missing = rows
       .map(r => {
         const flags = [];
+        const stage = r.primaryPipelineStageName || '';
         const valEmpty = r.contractValue === '' || r.contractValue === undefined;
         const gciEmpty = r.totalCommission === '' || r.totalCommission === undefined;
+        const isEstimatedStage = estimatedStageNamesGlobal.has(stage);
         if (valEmpty) flags.push('value');
-        if (gciEmpty) flags.push('commission');
-        return { id: r.id, name: r.name || '(unnamed)', stage: r.primaryPipelineStageName || '', flags };
+        // Missing commission isn't a real gap in stages currently using the dynamic
+        // estimate — that's expected there by CRM design, not something to fix.
+        if (gciEmpty && !isEstimatedStage) flags.push('commission');
+        return { id: r.id, name: r.name || '(unnamed)', stage, flags };
       })
       .filter(r => r.flags.length > 0 && r.id);
 
@@ -557,9 +566,8 @@ async function loadMissingData(){
   }
 }
 
-refreshBtn.addEventListener('click', () => { loadData(); loadMissingData(); });
+refreshBtn.addEventListener('click', () => { loadData(); });
 loadData();
-loadMissingData();
 </script>
 </body>
 </html>
