@@ -10,41 +10,58 @@
     --bg: #FAF8F4;
     --ink: #241F1A;
     --ink-dim: #6B655C;
-    --line: #E4DFD5;
+    --line: #E9E4D9;
     --card: #FFFFFF;
     --amber: #B4863E;
+    --blue: #3A6EA5;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-card: 0 1px 2px rgba(36,31,26,.05), 0 8px 24px -12px rgba(36,31,26,.14);
+    --shadow-card-hover: 0 4px 10px rgba(36,31,26,.06), 0 16px 36px -14px rgba(36,31,26,.20);
+    --shadow-pop: 0 2px 6px rgba(36,31,26,.06), 0 1px 2px rgba(36,31,26,.05);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    background: var(--bg); color: var(--ink); font-family:'Inter', sans-serif;
-    padding: 40px 40px 60px; min-width: 980px;
+    background:
+      radial-gradient(900px 420px at 8% -8%, rgba(180,134,62,.05), transparent 60%),
+      radial-gradient(900px 420px at 100% 0%, rgba(58,110,165,.05), transparent 55%),
+      var(--bg);
+    color: var(--ink); font-family:'Inter', sans-serif;
+    padding: 44px 44px 64px; min-width: 980px;
   }
-  .wrap{ max-width: 1120px; margin: 0 auto; }
+  .wrap{ max-width: 1140px; margin: 0 auto; }
 
-  header{ display:flex; justify-content:space-between; align-items:flex-end; border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:28px; }
-  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.14em; color:#9A7B4F; text-transform:uppercase; margin-bottom:8px; font-weight:600; }
-  h1{ font-size:26px; font-weight:800; letter-spacing:-0.01em; }
+  header{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:18px;
+    border-bottom:1px solid var(--line); padding-bottom:24px; margin-bottom:36px;
+  }
+  .brand{ display:flex; align-items:center; gap:16px; }
+  h1{ font-size:27px; font-weight:800; letter-spacing:-0.02em; }
 
   .status-bar{
-    display:flex; align-items:center; gap:14px; margin-bottom:28px;
-    background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 16px;
+    display:flex; align-items:center; gap:14px; margin-bottom:32px;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:13px 18px; box-shadow:var(--shadow-pop);
   }
-  .status-dot{ width:9px; height:9px; border-radius:50%; background:#ccc; flex-shrink:0; }
-  .status-dot.ok{ background:#4B8A5E; }
-  .status-dot.err{ background:#C24B3F; }
+  .status-dot{ width:9px; height:9px; border-radius:50%; background:#ccc; flex-shrink:0; transition:box-shadow .2s; }
+  .status-dot.ok{ background:#4B8A5E; box-shadow:0 0 0 4px rgba(75,138,94,.14); }
+  .status-dot.err{ background:#C24B3F; box-shadow:0 0 0 4px rgba(194,75,63,.14); }
   .status-text{ font-size:12.5px; color:var(--ink-dim); flex:1; }
   .status-text b{ color:var(--ink); }
   .refresh-btn{
     font-family:'JetBrains Mono', monospace; font-size:11.5px; font-weight:700;
-    background:#3A6EA5; color:#fff; border:none; border-radius:7px; padding:8px 14px;
-    cursor:pointer; flex-shrink:0;
+    background:var(--blue); color:#fff; border:none; border-radius:var(--radius-sm); padding:9px 16px;
+    cursor:pointer; flex-shrink:0; box-shadow:0 2px 8px rgba(58,110,165,.28);
+    transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
   }
-  .refresh-btn:hover{ opacity:.9; }
-  .refresh-btn:disabled{ opacity:.5; cursor:default; }
+  .refresh-btn:hover{ transform:translateY(-1px); box-shadow:0 4px 12px rgba(58,110,165,.34); }
+  .refresh-btn:active{ transform:translateY(0); }
+  .refresh-btn:disabled{ opacity:.5; cursor:default; transform:none; box-shadow:none; }
 
   .setup-box{
     background:#FFF9EE; border:1px solid #E9DFC4; border-left:3px solid var(--amber);
-    border-radius:0 8px 8px 0; padding:16px 20px; margin-bottom:28px; font-size:12.5px;
+    border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:16px 20px; margin-bottom:28px; font-size:12.5px;
     color:#5C4A28; line-height:1.6;
   }
   .setup-box code{
@@ -56,8 +73,16 @@
     border:1px solid #E9DFC4; border-radius:6px; margin-top:8px; background:#fff;
   }
 
-  .section-title{ font-size:16px; font-weight:700; margin: 34px 0 14px; }
-  .section-sub{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--ink-dim); font-weight:400; margin-left:8px; }
+  .section-title{
+    font-size:17px; font-weight:800; letter-spacing:-0.01em; margin: 44px 0 16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title::before{
+    content:""; width:5px; height:18px; border-radius:3px;
+    background:linear-gradient(180deg, var(--blue), var(--amber));
+    flex-shrink:0;
+  }
+  .section-sub{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--ink-dim); font-weight:400; }
 
   /* --- Funnel layout, matches the static reference funnels --- */
   .grid{ display:grid; grid-template-columns: 480px 1fr; gap: 20px; align-items:center; }
@@ -74,6 +99,7 @@
     flex-shrink:0; width:40px; height:40px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     color:#fff; font-weight:800; font-size:15px; font-family:'JetBrains Mono', monospace;
+    box-shadow:0 3px 8px rgba(36,31,26,.16);
   }
   .stage-body{ flex:1; padding-top:2px; }
   .stage-title-row{ display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
@@ -97,19 +123,24 @@
 
   /* --- Sold Properties Map --- */
   .sold-map-layout{ display:flex; gap:16px; align-items:stretch; }
-  #sold-map{ flex:1; min-height:420px; border:1px solid var(--line); border-radius:10px; background:#EFEAE0; }
+  #sold-map{
+    flex:1; min-height:420px; border:1px solid var(--line); border-radius:var(--radius-lg);
+    background:#EFEAE0; box-shadow:var(--shadow-card); overflow:hidden;
+  }
   .sold-sidebar{ width:280px; flex-shrink:0; max-height:420px; overflow-y:auto; }
   .sold-prop-card{
-    background:#fff; border:1px solid var(--line); border-left-width:3px; border-radius:6px;
-    padding:9px 12px; margin-bottom:8px; cursor:pointer; font-size:12px;
+    background:var(--card); border:1px solid var(--line); border-left-width:3px; border-radius:var(--radius-sm);
+    padding:10px 13px; margin-bottom:8px; cursor:pointer; font-size:12px;
+    box-shadow:var(--shadow-pop); transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
   }
-  .sold-prop-card:hover, .sold-prop-card.active{ border-color:#3A6EA5; border-left-color:#3A6EA5; }
+  .sold-prop-card:hover{ transform:translateY(-1px); box-shadow:var(--shadow-card-hover); }
+  .sold-prop-card:hover, .sold-prop-card.active{ border-color:var(--blue); border-left-color:var(--blue); }
   .sold-prop-card .addr{ font-weight:600; margin-bottom:3px; }
   .sold-prop-card .meta{ display:flex; justify-content:space-between; color:var(--ink-dim); font-family:'JetBrains Mono', monospace; font-size:10.5px; }
   .sold-key-bar{
     margin-top:14px; display:flex; align-items:center; justify-content:center; gap:22px; flex-wrap:wrap;
-    background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 16px;
-    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--ink-dim);
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md); padding:13px 18px;
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--ink-dim); box-shadow:var(--shadow-pop);
   }
   .sold-key-bar .swatch{ width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
   .sold-key-bar b{ color:var(--ink); font-size:13px; }
@@ -117,21 +148,51 @@
   .sold-info-window .row{ font-size:11.5px; color:#6B655C; display:flex; justify-content:space-between; gap:12px; font-family:'JetBrains Mono', monospace; }
 
   .alltime-box{
-    margin-top:16px; display:inline-flex; align-items:center; gap:16px;
-    background:#fff; border:1px dashed #3A6EA5; border-radius:10px; padding:14px 20px;
+    margin-top:16px; display:inline-flex; align-items:center; gap:18px;
+    background:linear-gradient(135deg, rgba(58,110,165,.06), rgba(58,110,165,.02));
+    border:1px solid rgba(58,110,165,.28); border-radius:var(--radius-md); padding:15px 22px;
+    box-shadow:var(--shadow-pop);
   }
   .alltime-box .lbl{
     font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700;
-    letter-spacing:.06em; text-transform:uppercase; color:#3A6EA5;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--blue);
   }
-  .alltime-box .big{ font-family:'JetBrains Mono', monospace; font-size:20px; font-weight:800; color:#3A6EA5; }
+  .alltime-box .big{ font-family:'JetBrains Mono', monospace; font-size:21px; font-weight:800; color:var(--blue); }
   .alltime-box .sub{ font-size:11px; color:var(--ink-dim); }
   .estimate-tag{ font-size:10.5px; color:var(--ink-dim); font-family:'JetBrains Mono', monospace; margin-left:6px; }
 
-  .missing-table{ border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#fff; max-width: 820px; }
-  .missing-row{ display:flex; align-items:center; gap:12px; padding:9px 14px; border-bottom:1px solid var(--line); font-size:12.5px; }
+  /* --- Gap to Goal --- */
+  .goal-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+  .goal-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius-lg); padding:20px 22px;
+    box-shadow:var(--shadow-card); transition:box-shadow .15s ease, transform .15s ease;
+  }
+  .goal-card:hover{ box-shadow:var(--shadow-card-hover); transform:translateY(-2px); }
+  .goal-card-title{
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:16px;
+  }
+  .goal-metric-row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .goal-metric-label{ font-size:12.5px; color:var(--ink-dim); }
+  .goal-metric-value{ font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:800; }
+  .goal-metric-value .of{ font-weight:400; color:var(--ink-dim); font-size:11px; }
+  .goal-metric-value.behind{ color:#C24B3F; }
+  .goal-metric-value.ahead{ color:#4B8A5E; }
+  .goal-bar-track{ height:8px; background:#F1EEE6; border-radius:4px; overflow:hidden; margin:9px 0 4px; }
+  .goal-bar-fill{ height:100%; border-radius:4px; background:var(--blue); transition:width .5s ease; }
+  .goal-note{ font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--ink-dim); margin-top:14px; line-height:1.6; }
+
+  .missing-table{
+    border:1px solid var(--line); border-radius:var(--radius-md); overflow:hidden;
+    background:var(--card); max-width: 820px; box-shadow:var(--shadow-card);
+  }
+  .missing-row{
+    display:flex; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--line);
+    font-size:12.5px; transition:background .12s ease;
+  }
   .missing-row:last-child{ border-bottom:none; }
   .missing-row:nth-child(even){ background:#FBFAF7; }
+  .missing-row:hover{ background:#F5F1E8; }
   .missing-name{ flex:1; font-weight:600; }
   .missing-flags{ display:flex; gap:5px; flex-shrink:0; }
   .miss-badge{
@@ -141,41 +202,44 @@
   }
   .fix-link{
     flex-shrink:0; font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700;
-    text-decoration:none; color:#3A6EA5; border:1px solid var(--line); border-radius:6px;
-    padding:4px 9px; transition:border-color .12s;
+    text-decoration:none; color:var(--blue); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:5px 11px; transition:border-color .12s ease, background .12s ease, color .12s ease;
   }
-  .fix-link:hover{ border-color: currentColor; }
+  .fix-link:hover{ background:var(--blue); border-color:var(--blue); color:#fff; }
 
-  footer{ margin-top:36px; padding-top:16px; border-top:1px solid var(--line); font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--ink-dim); display:flex; justify-content:space-between; }
+  footer{
+    margin-top:44px; padding-top:20px; border-top:1px solid var(--line);
+    font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--ink-dim);
+    display:flex; justify-content:space-between; letter-spacing:.02em;
+  }
 
   .header-nav{
-    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
-    font-family:'JetBrains Mono', monospace; font-size:11.5px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
   }
   .header-nav a{
-    color:#3A6EA5; text-decoration:none; font-weight:700; padding:6px 12px;
-    border:1px solid var(--line); border-radius:7px; background:#fff; transition:border-color .12s;
+    color:var(--ink); text-decoration:none; font-weight:700; padding:8px 14px;
+    border:1px solid var(--line); border-radius:999px; background:var(--card);
+    box-shadow:var(--shadow-pop); transition:background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
   }
-  .header-nav a:hover{ border-color:#3A6EA5; }
+  .header-nav a:hover{ background:var(--blue); border-color:var(--blue); color:#fff; transform:translateY(-1px); }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header style="flex-direction:column; align-items:flex-start; gap:16px;">
-    <img id="site-logo" src="logo.png" alt="The Steel Group" style="height:90px; width:auto; object-fit:contain;" onerror="this.style.display='none'">
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; flex-wrap:wrap; gap:14px;">
-      <div>
-        <div class="eyebrow">The Steel Group</div>
-        <h1>Live Pipeline Dashboard</h1>
-      </div>
-      <nav class="header-nav">
-        <a href="#anchor-lead">Lead Funnel</a>
-        <a href="#anchor-contract">Contract Funnel</a>
-        <a href="#anchor-sold">Sold Properties Map</a>
-        <a href="#anchor-missing">Missing Info</a>
-      </nav>
+  <header>
+    <div class="brand">
+      <img id="site-logo" src="logo.png" alt="The Steel Group" style="height:56px; width:auto; object-fit:contain;" onerror="this.style.display='none'">
+      <h1>Live Pipeline Dashboard</h1>
     </div>
+    <nav class="header-nav">
+      <a href="#anchor-lead">Lead Funnel</a>
+      <a href="#anchor-contract">Contract Funnel</a>
+      <a href="#anchor-goal">Gap to Goal</a>
+      <a href="#anchor-sold">Sold Properties Map</a>
+      <a href="#anchor-missing">Missing Info</a>
+    </nav>
   </header>
 
   <div class="status-bar">
@@ -197,6 +261,9 @@
     <div class="funnel-svg-wrap" id="contract-funnel"></div>
   </div>
   <div id="alltime-closed-box"></div>
+
+  <div class="section-title" id="anchor-goal">Gap to Goal <span class="section-sub">pace &amp; projected vs. annual target</span></div>
+  <div id="goal-gap-box"></div>
 
   <div class="section-title" id="anchor-sold">Sold Properties Map <span class="section-sub" id="sold-count-sub"></span></div>
   <div class="sold-map-layout">
@@ -246,6 +313,26 @@ const fmtInt = n => (n === '' || n === null || n === undefined || isNaN(n)) ? 0 
 const PALETTE = ["#C24B3F", "#D98A2B", "#C9A227", "#4B8A5E", "#3A6EA5", "#6B5B95", "#B4863E", "#8A6FA8"];
 let avgRateGlobal = 0;
 let estimatedStageNamesGlobal = new Set();
+
+// --- Gap to Goal config — edit these two directly, no separate settings UI ---
+const ANNUAL_DEAL_GOAL = 30;
+
+// Rough close-probability by pipeline stage, used only for the "Projected Year-End"
+// estimate below. These are assumptions, not your measured fall-through rates —
+// tune freely as you get real data on how often each stage actually closes.
+const STAGE_CLOSE_PROBABILITY = {
+  "Seller Consultation Scheduled": 0.15,
+  "Listing Agreement Signed": 0.20,
+  "Launch": 0.20,
+  "Listing Won": 0.25,
+  "Active": 0.30,
+  "First Open House": 0.30,
+  "Pending": 0.85,
+  "Under Contract": 0.75,
+  "Appraisal Complete": 0.90,
+  "Clear to Close": 0.95,
+  "Transaction Closed": 0.98
+};
 
 // Best-effort canonical ordering for readability — stages not in this list keep
 // whatever order the CSV returned them in, appended after known ones.
@@ -324,6 +411,7 @@ async function loadData(){
     renderPeopleFunnel([]);
     renderContractFunnel([]);
     renderAllTimeClosed(null, 0);
+    renderGoalGap([]);
     renderLeadStats(0, 0, 0);
     return;
   }
@@ -396,6 +484,7 @@ async function loadData(){
     renderPeopleFunnel(people);
     renderContractFunnel(contracts);
     renderAllTimeClosed(allTimeClosed, avgRate);
+    renderGoalGap(contracts);
     await loadMissingData();
 
     const totalLeads = totalLeadsAll;
@@ -407,6 +496,7 @@ async function loadData(){
     renderPeopleFunnel([]);
     renderContractFunnel([]);
     renderAllTimeClosed(null, 0);
+    renderGoalGap([]);
     renderLeadStats(0, 0, 0);
   } finally {
     refreshBtn.disabled = false;
@@ -549,6 +639,87 @@ function renderAllTimeClosed(row, avgRate){
         <div class="lbl">All-Time GCI</div>
         <div class="big">${fmtMoney(gci)}</div>
         <div class="sub">${missingC>0 ? `${missingC} missing commission` : 'YTD avg rate: ' + (avgRate*100).toFixed(2) + '%'}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGoalGap(contracts){
+  const el = document.getElementById('goal-gap-box');
+  if (!contracts || !contracts.length) { el.innerHTML = ''; return; }
+
+  const closedYtdRow = contracts.find(r => r.stage === 'Closed (YTD)');
+  const actualDeals = closedYtdRow ? fmtInt(closedYtdRow.count) : 0;
+  const actualGci = closedYtdRow && fmtInt(closedYtdRow.gci) ? parseFloat(closedYtdRow.gci) : 0;
+
+  // Dollar goal derived from real trailing avg GCI/deal, not a guessed number —
+  // stays in sync with your actual commission structure automatically.
+  const avgDealGci = actualDeals > 0 ? actualGci / actualDeals : 0;
+  const annualGciGoal = ANNUAL_DEAL_GOAL * avgDealGci;
+
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / 86400000) + 1;
+  const y = now.getFullYear();
+  const daysInYear = ((y % 4 === 0 && y % 100 !== 0) || y % 400 === 0) ? 366 : 365;
+  const yearFraction = dayOfYear / daysInYear;
+
+  const expectedDeals = ANNUAL_DEAL_GOAL * yearFraction;
+  const expectedGci = annualGciGoal * yearFraction;
+  const paceGapDeals = expectedDeals - actualDeals; // positive = behind pace
+  const paceGapGci = expectedGci - actualGci;
+
+  // Weighted pipeline projection — sums count/value across every open stage that
+  // has a probability assigned in STAGE_CLOSE_PROBABILITY above.
+  let weightedDeals = 0, weightedGci = 0, weightedContractCount = 0;
+  contracts.forEach(s => {
+    if (s.stage === 'Closed (YTD)') return;
+    const prob = STAGE_CLOSE_PROBABILITY[s.stage];
+    if (prob === undefined) return;
+    const count = fmtInt(s.count);
+    const value = fmtInt(s.value) ? parseFloat(s.value) : 0;
+    weightedDeals += count * prob;
+    weightedGci += value * avgRateGlobal * prob;
+    weightedContractCount += count;
+  });
+
+  const projectedDeals = actualDeals + weightedDeals;
+  const projectedGci = actualGci + weightedGci;
+  const projGapDeals = ANNUAL_DEAL_GOAL - projectedDeals; // positive = short of goal
+
+  const pacePct = Math.min(100, expectedDeals > 0 ? (actualDeals / expectedDeals) * 100 : 0);
+  const projPct = Math.min(100, (projectedDeals / ANNUAL_DEAL_GOAL) * 100);
+  const projColor = projGapDeals > 0.05 ? '#C24B3F' : '#4B8A5E';
+
+  el.innerHTML = `
+    <div class="goal-grid">
+      <div class="goal-card">
+        <div class="goal-card-title">Pace to Goal — Day ${dayOfYear} of ${daysInYear} (${(yearFraction*100).toFixed(0)}% through the year)</div>
+        <div class="goal-metric-row">
+          <span class="goal-metric-label">Deals closed YTD</span>
+          <span class="goal-metric-value">${actualDeals} <span class="of">/ ${expectedDeals.toFixed(1)} expected</span></span>
+        </div>
+        <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${pacePct}%"></div></div>
+        <div class="goal-metric-row" style="margin-top:12px;">
+          <span class="goal-metric-label">GCI YTD</span>
+          <span class="goal-metric-value">${fmtMoney(actualGci)} <span class="of">/ ${fmtMoney(expectedGci)} expected</span></span>
+        </div>
+        <div class="goal-note">${paceGapDeals > 0.05
+          ? `Behind pace by ${paceGapDeals.toFixed(1)} deals / ${fmtMoney(paceGapGci)}`
+          : `Ahead of pace by ${Math.abs(paceGapDeals).toFixed(1)} deals / ${fmtMoney(Math.abs(paceGapGci))}`}</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-title">Projected Year-End · vs ${ANNUAL_DEAL_GOAL}-deal goal</div>
+        <div class="goal-metric-row">
+          <span class="goal-metric-label">Projected deals</span>
+          <span class="goal-metric-value ${projGapDeals > 0.05 ? 'behind' : 'ahead'}">${projectedDeals.toFixed(1)} <span class="of">/ ${ANNUAL_DEAL_GOAL} goal</span></span>
+        </div>
+        <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${projPct}%; background:${projColor}"></div></div>
+        <div class="goal-metric-row" style="margin-top:12px;">
+          <span class="goal-metric-label">Projected GCI</span>
+          <span class="goal-metric-value">${fmtMoney(projectedGci)} <span class="of">/ ${fmtMoney(annualGciGoal)} goal</span></span>
+        </div>
+        <div class="goal-note">${actualDeals} closed + ${weightedDeals.toFixed(1)} probability-weighted from ${weightedContractCount} open pipeline contracts. Weights are assumptions — edit STAGE_CLOSE_PROBABILITY in the script to tune as real close rates come in.</div>
       </div>
     </div>
   `;
