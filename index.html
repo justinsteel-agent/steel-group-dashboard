@@ -491,6 +491,21 @@ function foldToSpine(rows, key){
   if (unmapped.length) {
     console.warn('Unmapped contract stages (dropped from funnel):', [...new Set(unmapped)]);
   }
+
+  // Emit every spine stage, including empty ones. A stage sitting at zero in
+  // the middle of the funnel is information — it is how you notice deals
+  // skipping a stage entirely, which quietly distorts conversion later.
+  // Closed (8) and Terminated (9) are handled separately and stay out.
+  SPINE.forEach(sp => {
+    if (sp.pos >= 8) return;
+    if (!buckets[sp.stage]) {
+      buckets[sp.stage] = { stage: sp.stage, entity: 'contract', pos: sp.pos,
+        count: 0, value: 0, gci: 0, weighted_gci: 0,
+        missing_value: 0, missing_commission: 0,
+        buyer: 0, seller: 0, other: 0, breakdown: [] };
+    }
+  });
+
   return Object.values(buckets).sort((a, b) => a.pos - b.pos);
 }
 
@@ -575,7 +590,7 @@ async function loadData(){
     estimatedStageNamesGlobal = new Set();
     contracts.forEach(s => {
       const realGci = fmtInt(s.gci) ? parseFloat(s.gci) : 0;
-      if (s.pos <= 5 && realGci === 0 && avgRate > 0) {
+      if (s.pos <= 5 && realGci === 0 && avgRate > 0 && fmtInt(s.count) > 0) {
         const val = fmtInt(s.value) ? parseFloat(s.value) : 0;
         s.gci = Math.round(val * avgRate * 100) / 100;
         s.estimated = true;
@@ -643,7 +658,8 @@ function buildFunnel(stages, { listElId, svgElId, hasMoney }){
     const breakdownList = (s.breakdown && s.breakdown.length)
       ? `<div class="rollup-list">${s.breakdown.map(b => `${b.name}: ${b.count}`).join(' · ')}</div>` : '';
     const sideSplit = (hasMoney && (s.buyer || s.seller))
-      ? `<span class="side-split">${s.buyer} buy · ${s.seller} sell</span>` : '';
+      ? `<span class="side-split">${s.buyer} buy · ${s.seller} sell</span>`
+      : (hasMoney && count === 0 ? `<span class="side-split">empty</span>` : '');
 
     if (hasMoney) {
       const value = fmtInt(s.value) ? parseFloat(s.value) : 0;
