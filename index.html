@@ -401,7 +401,11 @@ const LEGACY_TO_SPINE = {
 };
 function toSpine(stage){ return LEGACY_TO_SPINE[stage] || stage; }
 
-const PEOPLE_ORDER = ["New Lead","Called","Contacted","Qualifying","Appointment Set","Appointment Met","Active Client"];
+// Only these person stages render in the lead funnel, in this order. Anything
+// else — pond contacts, Non Active, Post Closing, and the Buyer/Seller/Buy-Sell
+// client types — is intentionally excluded; those are lifecycle states and
+// types, not funnel stages, and appending them produced the stray E–J rows.
+const PEOPLE_ORDER = ["New Lead","Appointment Set","Appointment Met","Active Client"];
 
 function getStoredUrl(){ return localStorage.getItem(STORAGE_KEY) || DEFAULT_STAGE_URL; }
 function getStoredRawUrl(){ return localStorage.getItem(RAW_STORAGE_KEY) || DEFAULT_RAW_URL; }
@@ -567,7 +571,16 @@ async function loadData(){
     renderGoalGap(contracts);
     await loadMissingData();
 
-    renderLeadStats(totalLeadsAll, metsRow ? fmtInt(metsRow.count) : 0, nurtureRow ? fmtInt(nurtureRow.count) : 0);
+    const pondRow = dataRows.find(r => r.entity === 'metric' && r.stage === 'Pond') || null;
+    const unstagedRow = dataRows.find(r => r.entity === 'metric' && r.stage === 'Unstaged') || null;
+    const totalRow = dataRows.find(r => r.entity === 'metric' && r.stage === 'Total People') || null;
+    renderLeadStats({
+      total: totalRow ? fmtInt(totalRow.count) : totalLeadsAll,
+      mets: metsRow ? fmtInt(metsRow.count) : 0,
+      pond: pondRow ? fmtInt(pondRow.count) : 0,
+      unstaged: unstagedRow ? fmtInt(unstagedRow.count) : 0,
+      nurture: nurtureRow ? fmtInt(nurtureRow.count) : 0
+    });
 
     setStatus('ok', 'Connected · <b>' + contracts.reduce((a,s)=>a+fmtInt(s.count),0) + '</b> open contracts');
     pullTimeEl.textContent = new Date().toLocaleString('en-US');
@@ -577,7 +590,7 @@ async function loadData(){
     renderContractFunnel([]);
     renderAllTimeClosed(null, 0);
     renderGoalGap([]);
-    renderLeadStats(0, 0, 0);
+    renderLeadStats({ total: 0, mets: 0, pond: 0, unstaged: 0, nurture: 0 });
   } finally {
     refreshBtn.disabled = false;
   }
@@ -678,23 +691,34 @@ function renderContractFunnel(contracts){
   buildFunnel(contracts, { listElId: 'contract-stages', svgElId: 'contract-funnel', hasMoney: true });
 }
 
-function renderLeadStats(totalLeads, mets, nurture){
+function renderLeadStats(s){
+  const s2 = (typeof s === 'object' && s !== null) ? s : { total: 0, mets: 0, pond: 0, unstaged: 0, nurture: 0 };
   document.getElementById('lead-stats-box').innerHTML = `
     <div class="alltime-box">
       <div>
         <div class="lbl">Total Leads</div>
-        <div class="big">${totalLeads}</div>
-        <div class="sub">all people records, every stage</div>
+        <div class="big">${s2.total}</div>
+        <div class="sub">every person record, pond included</div>
       </div>
       <div>
         <div class="lbl">Mets</div>
-        <div class="big">${mets}</div>
-        <div class="sub">SOI / past clients — tag-matched, unverified</div>
+        <div class="big">${s2.mets}</div>
+        <div class="sub">assigned to you — the Met database</div>
+      </div>
+      <div>
+        <div class="lbl">Pond</div>
+        <div class="big">${s2.pond}</div>
+        <div class="sub">unclaimed lead flow — no stage by design</div>
+      </div>
+      <div>
+        <div class="lbl">Unstaged</div>
+        <div class="big">${s2.unstaged}</div>
+        <div class="sub">not pond, no stage — outside the funnel</div>
       </div>
       <div>
         <div class="lbl">Nurture</div>
-        <div class="big">${nurture}</div>
-        <div class="sub">outside the pipeline — not actively worked</div>
+        <div class="big">${s2.nurture}</div>
+        <div class="sub">not actively worked</div>
       </div>
     </div>
   `;
