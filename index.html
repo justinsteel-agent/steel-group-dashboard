@@ -265,6 +265,7 @@
       <a href="#anchor-lead">Lead Funnel</a>
       <a href="#anchor-contract">Contract Funnel</a>
       <a href="#anchor-goal">Gap to Goal</a>
+      <a href="#anchor-projected">Projected Income</a>
       <a href="#anchor-conversion">Stage Conversion</a>
       <a href="#anchor-sold">Sold Properties Map</a>
       <a href="#anchor-missing">Missing Info</a>
@@ -295,6 +296,9 @@
 
   <div class="section-title" id="anchor-goal">Gap to Goal <span class="section-sub">pace &amp; projected vs. annual target</span></div>
   <div id="goal-gap-box"></div>
+
+  <div class="section-title" id="anchor-projected">Projected Income <span class="section-sub" id="proj-sub"></span></div>
+  <div id="projected-box"></div>
 
   <div class="section-title" id="anchor-conversion">Stage Conversion <span class="section-sub" id="conv-sub"></span></div>
   <div class="conv-controls">
@@ -350,6 +354,7 @@ let avgRateGlobal = 0;
 let estimatedStageNamesGlobal = new Set();
 let funnelRowsGlobal = [];
 let closedYtdGlobal = { count: 0, value: 0, gci: 0 };
+let contractsGlobal = [];
 
 const ANNUAL_DEAL_GOAL = 30;
 
@@ -524,7 +529,10 @@ async function loadData(){
     people = people.filter(r => r.stage !== 'Nurture');
 
     // Closed is summed across sides before being pulled out of the funnel.
-    const closedRows = contracts.filter(r => toSpine(r.stage) === 'Closed');
+    // Matched on spine position 8 first, falling back to the stage name, so a
+    // stale CSV or an unexpected stage label still resolves.
+    const closedRows = contracts.filter(r =>
+      parseInt(r.pos) === 8 || toSpine(String(r.stage || '').trim()) === 'Closed');
     const allTimeClosed = closedRows.length ? {
       stage: 'Closed',
       count: closedRows.reduce((a,r) => a + (parseFloat(r.count)||0), 0),
@@ -532,10 +540,16 @@ async function loadData(){
       gci: closedRows.reduce((a,r) => a + (parseFloat(r.gci)||0), 0),
       missing_commission: closedRows.reduce((a,r) => a + (parseFloat(r.missing_commission)||0), 0)
     } : null;
-    contracts = contracts.filter(r => toSpine(r.stage) !== 'Closed');
+    contracts = contracts.filter(r =>
+      !(parseInt(r.pos) === 8 || toSpine(String(r.stage || '').trim()) === 'Closed'));
 
-    // YTD now arrives as entity='closed_ytd', one row per side.
-    const ytdRows = dataRows.filter(r => r.entity === 'closed_ytd');
+    // YTD arrives as entity='closed_ytd'. The legacy shape put it under
+    // entity='contract' with stage 'Closed (YTD)' — both are accepted so a
+    // cached CSV from either schema still renders.
+    let ytdRows = dataRows.filter(r => r.entity === 'closed_ytd');
+    if (!ytdRows.length) {
+      ytdRows = dataRows.filter(r => String(r.stage || '').trim() === 'Closed (YTD)');
+    }
     closedYtdGlobal = ytdRows.length ? {
       count: ytdRows.reduce((a,r) => a + (parseFloat(r.count)||0), 0),
       value: ytdRows.reduce((a,r) => a + (parseFloat(r.value)||0), 0),
@@ -554,10 +568,14 @@ async function loadData(){
     // Commission isn't entered until later stages by CRM design, so early
     // stages get an estimated GCI rather than showing $0. Keyed on spine
     // position now, not array index.
+    // Estimation now covers every pre-contract stage (0-5), not just the first
+    // three. A signed listing agreement is permission to market, not a sale —
+    // the commission depends on a sale price that does not exist yet, so it is
+    // unknowable rather than missing.
     estimatedStageNamesGlobal = new Set();
     contracts.forEach(s => {
       const realGci = fmtInt(s.gci) ? parseFloat(s.gci) : 0;
-      if (s.pos <= 2 && realGci === 0 && avgRate > 0) {
+      if (s.pos <= 5 && realGci === 0 && avgRate > 0) {
         const val = fmtInt(s.value) ? parseFloat(s.value) : 0;
         s.gci = Math.round(val * avgRate * 100) / 100;
         s.estimated = true;
@@ -569,6 +587,8 @@ async function loadData(){
     renderContractFunnel(contracts);
     renderAllTimeClosed(allTimeClosed, avgRate);
     renderGoalGap(contracts);
+    contractsGlobal = contracts;
+    renderProjected(contracts);
     await loadMissingData();
 
     const pondRow = dataRows.find(r => r.entity === 'metric' && r.stage === 'Pond') || null;
@@ -581,6 +601,12 @@ async function loadData(){
       unstaged: unstagedRow ? fmtInt(unstagedRow.count) : 0,
       nurture: nurtureRow ? fmtInt(nurtureRow.count) : 0
     });
+
+    console.log('[dashboard] rows:', dataRows.length,
+      '| entities:', [...new Set(dataRows.map(r => r.entity))],
+      '| closed rows:', closedRows.length,
+      '| ytd rows:', ytdRows.length,
+      '| headers:', headers);
 
     setStatus('ok', 'Connected · <b>' + contracts.reduce((a,s)=>a+fmtInt(s.count),0) + '</b> open contracts');
     pullTimeEl.textContent = new Date().toLocaleString('en-US');
@@ -823,6 +849,92 @@ function renderGoalGap(contracts){
 }
 
 // ============================================================
+// PROJECTED INCOME
+// ============================================================
+// Separates money reasonably owed (under contract, real commission entered)
+// from money that depends on deals converting. Uses measured close rates from
+// Stage_Funnel where the sample is large enough, assumptions otherwise, and
+// says which on the card.
+
+function closeRateFor(pos){
+  const row = funnelRowsGlobal.find(r => r.side === 'all' && parseInt(r.pos) === pos);
+  if (row && row.reliable === 'yes' && row.close_rate !== '' && !isNaN(parseFloat(row.close_rate))) {
+    return { rate: parseFloat(row.close_rate) / 100, measured: true };
+  }
+  const name = POS_TO_STAGE[pos];
+  return { rate: SPINE_PROB[name] !== undefined ? SPINE_PROB[name] : 0, measured: false };
+}
+
+function renderProjected(contracts){
+  const el = document.getElementById('projected-box');
+  const sub = document.getElementById('proj-sub');
+  if (!contracts || !contracts.length) { el.innerHTML = ''; sub.textContent = ''; return; }
+
+  let contracted = 0, contractedCount = 0;
+  let projected = 0, projectedCount = 0;
+  let anyMeasured = false;
+  const lines = [];
+
+  contracts.forEach(s => {
+    const pos = s.pos;
+    if (pos === 9) return;
+    const count = fmtInt(s.count);
+    if (!count) return;
+    const value = fmtInt(s.value) ? parseFloat(s.value) : 0;
+    const realGci = (!s.estimated && fmtInt(s.gci)) ? parseFloat(s.gci) : 0;
+
+    if (pos >= 6) {
+      const amt = realGci > 0 ? realGci : value * avgRateGlobal;
+      contracted += amt;
+      contractedCount += count;
+      lines.push({ stage: s.stage, count: count, rate: null, amount: amt, contracted: true });
+    } else {
+      const cr = closeRateFor(pos);
+      if (cr.measured) anyMeasured = true;
+      const base = realGci > 0 ? realGci : value * avgRateGlobal;
+      const amt = base * cr.rate;
+      projected += amt;
+      projectedCount += count;
+      lines.push({ stage: s.stage, count: count, rate: cr.rate, amount: amt,
+        contracted: false, measured: cr.measured });
+    }
+  });
+
+  sub.textContent = anyMeasured ? 'measured close rates where sample allows'
+    : 'assumed close rates — no conversion data yet';
+
+  const rows = lines.map(l => `
+    <div class="conv-row">
+      <span class="conv-stage">${l.stage}<span style="color:var(--ink-dim); font-weight:400;"> · ${l.count}</span></span>
+      <span class="conv-num ${l.rate === null ? 'dim' : ''}">${l.rate === null ? 'signed' : Math.round(l.rate*100) + '%'}</span>
+      <span class="conv-num">${fmtMoney(l.amount)}</span>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="goal-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom:18px;">
+      <div class="goal-card">
+        <div class="goal-card-title">Contracted</div>
+        <div class="goal-metric-value" style="font-size:21px;">${fmtMoney(contracted)}</div>
+        <div class="goal-note">${contractedCount} contract${contractedCount===1?'':'s'} past negotiation · commission agreed</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-title">Projected additional</div>
+        <div class="goal-metric-value" style="font-size:21px;">${fmtMoney(projected)}</div>
+        <div class="goal-note">${projectedCount} contract${projectedCount===1?'':'s'} pre-contract · weighted by close rate</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-title">Total expected</div>
+        <div class="goal-metric-value" style="font-size:21px;">${fmtMoney(contracted + projected)}</div>
+        <div class="goal-note">at ${(avgRateGlobal*100).toFixed(2)}% avg closed commission rate</div>
+      </div>
+    </div>
+    <div class="conv-table">
+      <div class="conv-row head"><span class="conv-stage">Stage</span><span class="conv-num">Close rate</span><span class="conv-num">Expected</span></div>
+      ${rows}
+    </div>`;
+}
+
+// ============================================================
 // STAGE CONVERSION
 // ============================================================
 
@@ -851,6 +963,7 @@ async function loadFunnel(){
       const o = {}; headers.forEach((h,i) => o[h] = r[i]); return o;
     });
     renderConversion('all');
+    if (contractsGlobal.length) renderProjected(contractsGlobal);
   } catch (err) {
     sub.textContent = '';
     el.innerHTML = `<div class="empty-state">Fetch failed: ${err.message}. Confirm <b>Stage_Funnel</b> is published as CSV.</div>`;
@@ -942,7 +1055,9 @@ async function loadMissingData(){
           && (r.propertyStreet === '' || r.propertyStreet === undefined);
         const isEstimatedStage = estimatedStageNamesGlobal.has(spineStage);
         if (valEmpty) flags.push('value');
-        if (gciEmpty && !isEstimatedStage) flags.push('commission');
+        // Pre-contract commission is unknowable, not missing.
+        const prePos = SPINE_POS[spineStage];
+        if (gciEmpty && !isEstimatedStage && !(prePos !== undefined && prePos <= 5)) flags.push('commission');
         // Address gaps only matter for deals that will reach the sold map.
         if (addrEmpty && SPINE_POS[spineStage] >= 6) flags.push('address');
         return { id: r.id, name: r.name || '(unnamed)', stage, flags };
