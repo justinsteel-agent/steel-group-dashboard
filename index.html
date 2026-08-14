@@ -370,7 +370,12 @@ const SPINE = [
 ];
 const SPINE_POS = {};
 const SPINE_PROB = {};
-SPINE.forEach(s => { SPINE_POS[s.stage] = s.pos; SPINE_PROB[s.stage] = s.prob; });
+const POS_TO_STAGE = {};
+SPINE.forEach(s => {
+  SPINE_POS[s.stage] = s.pos;
+  SPINE_PROB[s.stage] = s.prob;
+  POS_TO_STAGE[s.pos] = s.stage;
+});
 
 // Legacy stage names, still live until every contract is migrated. Anything
 // here folds into its spine equivalent rather than being dropped — the old
@@ -429,15 +434,33 @@ function parseCSV(text){
 }
 
 // Folds every contract row onto the spine and sums across the side dimension.
-// Stage_Summary now emits one row per stage PER SIDE, so any lookup that used
-// .find() on a stage name would silently match only buyer or only seller.
+// Stage_Summary emits one row per stage PER SIDE, so any lookup using .find()
+// on a stage name would silently match only buyer or only seller.
+//
+// Position comes from the `pos` column, which the Apps Script resolves from
+// the stage ID — that is authoritative. Name matching is only a fallback for
+// rows written before `pos` existed. Deriving position from the name here was
+// what produced wrong stage labels in the contract funnel.
 function foldToSpine(rows, key){
   const buckets = {};
+  const unmapped = [];
+
   rows.forEach(r => {
-    const canonical = toSpine(r[key]);
-    if (SPINE_POS[canonical] === undefined) return;
+    let pos = parseInt(r.pos);
+    if (isNaN(pos) || pos < 0) {
+      const guessed = toSpine(String(r[key] || '').trim());
+      pos = SPINE_POS[guessed];
+    }
+    if (pos === undefined || pos === null || isNaN(pos) || pos < 0) {
+      unmapped.push(r[key]);
+      return;
+    }
+
+    const canonical = POS_TO_STAGE[pos];
+    if (!canonical) { unmapped.push(r[key]); return; }
+
     if (!buckets[canonical]) {
-      buckets[canonical] = { [key]: canonical, entity: r.entity, pos: SPINE_POS[canonical],
+      buckets[canonical] = { [key]: canonical, entity: r.entity, pos: pos,
         count: 0, value: 0, gci: 0, weighted_gci: 0,
         missing_value: 0, missing_commission: 0,
         buyer: 0, seller: 0, other: 0, breakdown: [] };
@@ -455,14 +478,20 @@ function foldToSpine(rows, key){
       b.breakdown.push({ name: r[key] + (r.side ? ' (' + r.side + ')' : ''), count: c });
     }
   });
+
+  if (unmapped.length) {
+    console.warn('Unmapped contract stages (dropped from funnel):', [...new Set(unmapped)]);
+  }
   return Object.values(buckets).sort((a, b) => a.pos - b.pos);
 }
 
+// People only. Contracts route through foldToSpine instead, so this can drop
+// unrecognized stages — appending them is what produced the stray E–J rows in
+// the lead funnel. To surface a person stage here, add it to PEOPLE_ORDER.
 function filterAndSort(rows, orderList, key){
   const known = rows.filter(r => orderList.includes(r[key]));
   known.sort((a,b) => orderList.indexOf(a[key]) - orderList.indexOf(b[key]));
-  const unknown = rows.filter(r => !orderList.includes(r[key]));
-  return known.concat(unknown);
+  return known;
 }
 
 async function loadData(){
