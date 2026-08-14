@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>The Steel Group — Live Pipeline (Tier 1)</title>
+<title>The Steel Group — Live Pipeline</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
@@ -59,18 +59,10 @@
   .refresh-btn:active{ transform:translateY(0); }
   .refresh-btn:disabled{ opacity:.5; cursor:default; transform:none; box-shadow:none; }
 
-  .setup-box{
-    background:#FFF9EE; border:1px solid #E9DFC4; border-left:3px solid var(--amber);
-    border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:16px 20px; margin-bottom:28px; font-size:12.5px;
-    color:#5C4A28; line-height:1.6;
-  }
-  .setup-box code{
-    font-family:'JetBrains Mono', monospace; background:#fff; border:1px solid #E9DFC4;
-    border-radius:4px; padding:1px 5px; font-size:11.5px;
-  }
-  .setup-box input{
-    width:100%; font-family:'JetBrains Mono', monospace; font-size:12px; padding:7px 10px;
-    border:1px solid #E9DFC4; border-radius:6px; margin-top:8px; background:#fff;
+  .migration-banner{
+    background:#FFF3DA; border:1px solid #E9DFC4; border-left:3px solid var(--amber);
+    border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:13px 18px; margin-bottom:28px;
+    font-size:12.5px; color:#5C4A28; line-height:1.6; display:none;
   }
 
   .section-title{
@@ -84,7 +76,6 @@
   }
   .section-sub{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--ink-dim); font-weight:400; }
 
-  /* --- Funnel layout, matches the static reference funnels --- */
   .grid{ display:grid; grid-template-columns: 480px 1fr; gap: 20px; align-items:center; }
   .funnel-svg-wrap{ position:relative; }
 
@@ -104,6 +95,10 @@
   .stage-body{ flex:1; padding-top:2px; }
   .stage-title-row{ display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
   .stage-title{ font-size:15px; font-weight:700; }
+  .side-split{
+    font-family:'JetBrains Mono', monospace; font-size:9.5px; color:var(--ink-dim);
+    background:#F1EEE6; border-radius:4px; padding:1px 6px;
+  }
   .value-row{ display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
   .value-big{ font-family:'JetBrains Mono', monospace; font-size:19px; font-weight:800; }
   .value-count{ font-size:11px; color:var(--ink-dim); }
@@ -119,7 +114,41 @@
     border-radius:4px; padding:1px 6px; font-weight:600;
   }
   .rollup-list{ font-size:11px; color:var(--ink-dim); margin-top:6px; line-height:1.5; }
-  .empty-state{ text-align:center; padding:30px 20px; color:var(--ink-dim); font-size:12.5px; }
+  .empty-state{ text-align:center; padding:30px 20px; color:var(--ink-dim); font-size:12.5px; line-height:1.7; }
+
+  /* --- Stage conversion --- */
+  .conv-controls{ display:flex; gap:8px; margin-bottom:14px; }
+  .conv-btn{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; font-weight:700;
+    background:#8A8580; color:#fff; border:none; border-radius:var(--radius-sm);
+    padding:8px 16px; cursor:pointer; transition:background .12s ease;
+  }
+  .conv-btn.active{ background:var(--blue); }
+  .conv-table{
+    border:1px solid var(--line); border-radius:var(--radius-md); overflow:hidden;
+    background:var(--card); max-width:860px; box-shadow:var(--shadow-card);
+  }
+  .conv-row{
+    display:flex; align-items:center; gap:14px; padding:11px 16px;
+    border-bottom:1px solid var(--line); font-size:12.5px;
+  }
+  .conv-row:last-child{ border-bottom:none; }
+  .conv-row:nth-child(even){ background:#FBFAF7; }
+  .conv-row.head{
+    background:#F5F1E8; font-family:'JetBrains Mono',monospace; font-size:9.5px;
+    font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim);
+  }
+  .conv-pos{
+    width:22px; flex-shrink:0; font-family:'JetBrains Mono',monospace;
+    font-size:11px; color:var(--ink-dim); font-weight:700;
+  }
+  .conv-stage{ flex:1; font-weight:600; }
+  .conv-num{ width:80px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:700; flex-shrink:0; }
+  .conv-num.dim{ font-weight:400; color:var(--ink-dim); }
+  .conv-thin{
+    font-size:9.5px; color:var(--amber); background:#FFF3DA; border:1px solid #E9DFC4;
+    border-radius:4px; padding:1px 5px; font-weight:600; margin-left:6px;
+  }
 
   /* --- Sold Properties Map --- */
   .sold-map-layout{ display:flex; gap:16px; align-items:stretch; }
@@ -161,7 +190,6 @@
   .alltime-box .sub{ font-size:11px; color:var(--ink-dim); }
   .estimate-tag{ font-size:10.5px; color:var(--ink-dim); font-family:'JetBrains Mono', monospace; margin-left:6px; }
 
-  /* --- Gap to Goal --- */
   .goal-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
   .goal-card{
     background:var(--card); border:1px solid var(--line); border-radius:var(--radius-lg); padding:20px 22px;
@@ -237,6 +265,7 @@
       <a href="#anchor-lead">Lead Funnel</a>
       <a href="#anchor-contract">Contract Funnel</a>
       <a href="#anchor-goal">Gap to Goal</a>
+      <a href="#anchor-conversion">Stage Conversion</a>
       <a href="#anchor-sold">Sold Properties Map</a>
       <a href="#anchor-missing">Missing Info</a>
     </nav>
@@ -248,6 +277,8 @@
     <button class="refresh-btn" id="refresh-btn">Refresh now</button>
   </div>
 
+  <div class="migration-banner" id="migration-banner"></div>
+
   <div class="section-title" id="anchor-lead">Lead Funnel <span class="section-sub">people, by stage</span></div>
   <div class="grid">
     <div id="people-stages"></div>
@@ -255,7 +286,7 @@
   </div>
   <div id="lead-stats-box"></div>
 
-  <div class="section-title" id="anchor-contract">Contract Funnel <span class="section-sub">contracts, by stage — value &amp; GCI</span></div>
+  <div class="section-title" id="anchor-contract">Contract Funnel <span class="section-sub">contracts, by TSG stage — value &amp; GCI</span></div>
   <div class="grid">
     <div id="contract-stages"></div>
     <div class="funnel-svg-wrap" id="contract-funnel"></div>
@@ -264,6 +295,14 @@
 
   <div class="section-title" id="anchor-goal">Gap to Goal <span class="section-sub">pace &amp; projected vs. annual target</span></div>
   <div id="goal-gap-box"></div>
+
+  <div class="section-title" id="anchor-conversion">Stage Conversion <span class="section-sub" id="conv-sub"></span></div>
+  <div class="conv-controls">
+    <button class="conv-btn active" data-side="all">All</button>
+    <button class="conv-btn" data-side="buyer">Buyer</button>
+    <button class="conv-btn" data-side="seller">Seller</button>
+  </div>
+  <div id="conversion-table"></div>
 
   <div class="section-title" id="anchor-sold">Sold Properties Map <span class="section-sub" id="sold-count-sub"></span></div>
   <div class="sold-map-layout">
@@ -286,19 +325,18 @@
 <script>
 const STORAGE_KEY = 'suresend_csv_url';
 const RAW_STORAGE_KEY = 'suresend_raw_contracts_csv_url';
+const FUNNEL_STORAGE_KEY = 'suresend_funnel_csv_url';
 
-// Baked in as defaults — these are already public "anyone with the link" URLs
-// (that's what Publish to web means), so hardcoding them here adds no new exposure
-// beyond what already exists. localStorage still overrides these if you ever
-// change which sheet you're pointing at.
 const DEFAULT_STAGE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5p3_GYBrPG_-skbMKvJA2MLYWvokTjWMI4P_gDrCbzsp3QTmSezrLoo2uFP9GraJdJ2XBF7oO9-J2/pub?gid=1715969638&single=true&output=csv";
 const DEFAULT_RAW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5p3_GYBrPG_-skbMKvJA2MLYWvokTjWMI4P_gDrCbzsp3QTmSezrLoo2uFP9GraJdJ2XBF7oO9-J2/pub?gid=2028906285&single=true&output=csv";
-
-// Sold Properties Map — fill these in once you have them (Sold_Properties tab
-// published as CSV, and your Google Maps API key). Same pattern as above:
-// hardcoded here, no separate setup box.
 const SOLD_PROPERTIES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5p3_GYBrPG_-skbMKvJA2MLYWvokTjWMI4P_gDrCbzsp3QTmSezrLoo2uFP9GraJdJ2XBF7oO9-J2/pub?gid=2036363146&single=true&output=csv";
+
+// PASTE THE Stage_Funnel PUBLISHED CSV URL HERE.
+// Google Sheet > File > Share > Publish to web > Stage_Funnel > CSV.
+const DEFAULT_FUNNEL_URL = "PASTE_STAGE_FUNNEL_CSV_URL_HERE";
+
 const GOOGLE_MAPS_API_KEY = "AIzaSyDFyvVyYeu0ygOBcsGUoKBsfVAlYat9cTI";
+
 const statusDot = document.getElementById('status-dot');
 const statusText = document.getElementById('status-text');
 const pullTimeEl = document.getElementById('pull-time');
@@ -307,76 +345,62 @@ const refreshBtn = document.getElementById('refresh-btn');
 const fmtMoney = n => (n === '' || n === null || n === undefined || isNaN(n)) ? '$0' : '$' + Math.round(n).toLocaleString('en-US');
 const fmtInt = n => (n === '' || n === null || n === undefined || isNaN(n)) ? 0 : parseInt(n);
 
-// Color palette cycled across however many stages actually show up — order isn't
-// guaranteed meaningful (comes from Stage_Summary row order), so this is stylistic,
-// not a claim about pipeline sequence.
 const PALETTE = ["#C24B3F", "#D98A2B", "#C9A227", "#4B8A5E", "#3A6EA5", "#6B5B95", "#B4863E", "#8A6FA8"];
 let avgRateGlobal = 0;
 let estimatedStageNamesGlobal = new Set();
+let funnelRowsGlobal = [];
+let closedYtdGlobal = { count: 0, value: 0, gci: 0 };
 
-// --- Gap to Goal config — edit these two directly, no separate settings UI ---
 const ANNUAL_DEAL_GOAL = 30;
 
-// Rough close-probability by pipeline stage, used only for the "Projected Year-End"
-// estimate below. These are assumptions, not your measured fall-through rates —
-// tune freely as you get real data on how often each stage actually closes.
-const STAGE_CLOSE_PROBABILITY = {
-  "Seller Consultation Scheduled": 0.15,
-  "Listing Agreement Signed": 0.20,
-  "Launch": 0.20,
-  "Listing Won": 0.25,
-  "Active": 0.30,
-  "First Open House": 0.30,
-  "Pending": 0.85,
-  "Under Contract": 0.75,
-  "Appraisal Complete": 0.90,
-  "Clear to Close": 0.95,
-  "Transaction Closed": 0.98
-};
+// The TSG spine. Mirrors STAGE_SPINE in the Apps Script — change a weight in
+// one place and it must change in the other, or the client projection and the
+// server weighted_gci column will disagree.
+const SPINE = [
+  { pos: 0, stage: 'Prospecting',            prob: 0.05 },
+  { pos: 1, stage: 'Consultation Scheduled', prob: 0.10 },
+  { pos: 2, stage: 'Consultation Held',      prob: 0.20 },
+  { pos: 3, stage: 'Agreement Signed',       prob: 0.40 },
+  { pos: 4, stage: 'Active',                 prob: 0.50 },
+  { pos: 5, stage: 'Negotiations',           prob: 0.70 },
+  { pos: 6, stage: 'Under Contract',         prob: 0.85 },
+  { pos: 7, stage: 'Clear to Close',         prob: 0.95 },
+  { pos: 8, stage: 'Closed',                 prob: 1.00 },
+  { pos: 9, stage: 'Terminated',             prob: 0.00 }
+];
+const SPINE_POS = {};
+const SPINE_PROB = {};
+SPINE.forEach(s => { SPINE_POS[s.stage] = s.pos; SPINE_PROB[s.stage] = s.prob; });
 
-// Best-effort canonical ordering for readability — stages not in this list keep
-// whatever order the CSV returned them in, appended after known ones.
+// Legacy stage names, still live until every contract is migrated. Anything
+// here folds into its spine equivalent rather than being dropped — the old
+// filterAndSort silently discarded unknown stages, which is why contracts in
+// Showing Property and Final Walk-Through never appeared.
+const LEGACY_TO_SPINE = {
+  'Referral Sent':'Prospecting','Launch':'Prospecting',
+  'Seller Consultation Scheduled':'Consultation Scheduled',
+  'Initial Consultation':'Consultation Scheduled','Client Contacted':'Consultation Scheduled',
+  'Listing Presentation':'Consultation Held',
+  'Listing Won':'Agreement Signed','Listing Agreement Signed':'Agreement Signed','Pre-Approval':'Agreement Signed',
+  'Listed on MLS':'Active','Property Search':'Active','Showing Property':'Active',
+  'First Open House':'Active','Photos Scheduled':'Active','Photos Complete':'Active',
+  'Prepare Listing Documents':'Active',
+  'Offer Received':'Negotiations','Offer Submitted':'Negotiations',
+  'Offer Accepted':'Under Contract','Pending':'Under Contract',
+  'Inspection Scheduled':'Under Contract','Inspection Period':'Under Contract',
+  'Inspection Complete':'Under Contract','Appraisal Ordered':'Under Contract',
+  'Appraisal Complete':'Under Contract','Financing Contingency':'Under Contract',
+  'Loan Application':'Under Contract','Underwriting':'Under Contract',
+  'Final Walk-Through':'Clear to Close',
+  'Transaction Closed':'Closed'
+};
+function toSpine(stage){ return LEGACY_TO_SPINE[stage] || stage; }
+
 const PEOPLE_ORDER = ["New Lead","Called","Contacted","Qualifying","Appointment Set","Appointment Met","Active Client"];
-const CONTRACT_ORDER = ["Seller Consultation Scheduled","Listing Agreement Signed","Launch","Listing Won","Active","Pending","Under Contract","First Open House","Clear to Close","Appraisal Complete","Transaction Closed","Closed (YTD)"];
-
-// Manually-defined merges: combine multiple raw stage names into one displayed
-// stage, with a breakdown of the original names/counts kept visible underneath.
-// "Listed on MLS" (seller-side) and "Property Search" (buyer-side) both represent
-// an actively-working deal, just from opposite sides of the transaction.
-const MERGE_GROUPS = {
-  contract: [
-    { label: "Active", members: ["Listed on MLS", "Property Search"] }
-  ],
-  person: []
-};
-
-function applyMergeGroups(rows, key, groups){
-  let result = [...rows];
-  groups.forEach(group => {
-    const matches = result.filter(r => group.members.includes(r[key]));
-    if (!matches.length) return;
-    result = result.filter(r => !group.members.includes(r[key]));
-
-    const merged = { [key]: group.label, entity: matches[0].entity };
-    ['count','value','gci','missing_value','missing_commission'].forEach(field => {
-      merged[field] = matches.reduce((acc, r) => acc + (fmtInt(r[field]) ? parseFloat(r[field]) : 0), 0);
-    });
-    merged.breakdown = matches.map(r => ({ name: r[key], count: fmtInt(r.count) }));
-    result.push(merged);
-  });
-  return result;
-}
-
-function filterAndSort(rows, orderList, key){
-  const known = rows.filter(r => orderList.includes(r[key]));
-  known.sort((a,b) => orderList.indexOf(a[key]) - orderList.indexOf(b[key]));
-  return known;
-}
 
 function getStoredUrl(){ return localStorage.getItem(STORAGE_KEY) || DEFAULT_STAGE_URL; }
-function setStoredUrl(url){ localStorage.setItem(STORAGE_KEY, url); }
 function getStoredRawUrl(){ return localStorage.getItem(RAW_STORAGE_KEY) || DEFAULT_RAW_URL; }
-function setStoredRawUrl(url){ localStorage.setItem(RAW_STORAGE_KEY, url); }
+function getStoredFunnelUrl(){ return localStorage.getItem(FUNNEL_STORAGE_KEY) || DEFAULT_FUNNEL_URL; }
 
 function setStatus(state, text){
   statusDot.className = 'status-dot' + (state ? ' ' + state : '');
@@ -404,18 +428,45 @@ function parseCSV(text){
   return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ''));
 }
 
+// Folds every contract row onto the spine and sums across the side dimension.
+// Stage_Summary now emits one row per stage PER SIDE, so any lookup that used
+// .find() on a stage name would silently match only buyer or only seller.
+function foldToSpine(rows, key){
+  const buckets = {};
+  rows.forEach(r => {
+    const canonical = toSpine(r[key]);
+    if (SPINE_POS[canonical] === undefined) return;
+    if (!buckets[canonical]) {
+      buckets[canonical] = { [key]: canonical, entity: r.entity, pos: SPINE_POS[canonical],
+        count: 0, value: 0, gci: 0, weighted_gci: 0,
+        missing_value: 0, missing_commission: 0,
+        buyer: 0, seller: 0, other: 0, breakdown: [] };
+    }
+    const b = buckets[canonical];
+    ['count','value','gci','weighted_gci','missing_value','missing_commission'].forEach(f => {
+      const n = parseFloat(r[f]);
+      if (!isNaN(n)) b[f] += n;
+    });
+    const c = parseFloat(r.count) || 0;
+    if (r.side === 'buyer') b.buyer += c;
+    else if (r.side === 'seller') b.seller += c;
+    else b.other += c;
+    if (r[key] !== canonical) {
+      b.breakdown.push({ name: r[key] + (r.side ? ' (' + r.side + ')' : ''), count: c });
+    }
+  });
+  return Object.values(buckets).sort((a, b) => a.pos - b.pos);
+}
+
+function filterAndSort(rows, orderList, key){
+  const known = rows.filter(r => orderList.includes(r[key]));
+  known.sort((a,b) => orderList.indexOf(a[key]) - orderList.indexOf(b[key]));
+  const unknown = rows.filter(r => !orderList.includes(r[key]));
+  return known.concat(unknown);
+}
+
 async function loadData(){
   const url = getStoredUrl();
-  if(!url){
-    setStatus('', 'Not connected yet — paste your published CSV URL above.');
-    renderPeopleFunnel([]);
-    renderContractFunnel([]);
-    renderAllTimeClosed(null, 0);
-    renderGoalGap([]);
-    renderLeadStats(0, 0, 0);
-    return;
-  }
-
   setStatus('', 'Fetching…');
   refreshBtn.disabled = true;
 
@@ -434,46 +485,46 @@ async function loadData(){
     let people = dataRows.filter(s => s.entity === 'person');
     let contracts = dataRows.filter(s => s.entity === 'contract');
 
-    // Total Leads = every person record, full stop — computed before any stage
-    // filtering, so it reflects your real headcount, not just the trimmed
-    // pipeline subset shown in the funnel below.
     const totalLeadsAll = people.reduce((acc, r) => acc + fmtInt(r.count), 0);
-
-    // Nurture and Mets sit outside the lettered pipeline — pulled out before filtering.
     const nurtureRow = people.find(r => r.stage === 'Nurture') || null;
     const metsRow = dataRows.find(r => r.entity === 'metric' && r.stage === 'Mets') || null;
     people = people.filter(r => r.stage !== 'Nurture');
 
-    // Pull the all-time "Closed" row out before it enters the pipeline — it's shown
-    // separately, and also feeds the dynamic average-rate estimate for early stages.
-    const allTimeClosed = contracts.find(r => r.stage === 'Closed') || null;
-    contracts = contracts.filter(r => r.stage !== 'Closed');
+    // Closed is summed across sides before being pulled out of the funnel.
+    const closedRows = contracts.filter(r => toSpine(r.stage) === 'Closed');
+    const allTimeClosed = closedRows.length ? {
+      stage: 'Closed',
+      count: closedRows.reduce((a,r) => a + (parseFloat(r.count)||0), 0),
+      value: closedRows.reduce((a,r) => a + (parseFloat(r.value)||0), 0),
+      gci: closedRows.reduce((a,r) => a + (parseFloat(r.gci)||0), 0),
+      missing_commission: closedRows.reduce((a,r) => a + (parseFloat(r.missing_commission)||0), 0)
+    } : null;
+    contracts = contracts.filter(r => toSpine(r.stage) !== 'Closed');
 
-    people = applyMergeGroups(people, 'stage', MERGE_GROUPS.person);
-    contracts = applyMergeGroups(contracts, 'stage', MERGE_GROUPS.contract);
+    // YTD now arrives as entity='closed_ytd', one row per side.
+    const ytdRows = dataRows.filter(r => r.entity === 'closed_ytd');
+    closedYtdGlobal = ytdRows.length ? {
+      count: ytdRows.reduce((a,r) => a + (parseFloat(r.count)||0), 0),
+      value: ytdRows.reduce((a,r) => a + (parseFloat(r.value)||0), 0),
+      gci: ytdRows.reduce((a,r) => a + (parseFloat(r.gci)||0), 0)
+    } : { count: 0, value: 0, gci: 0 };
+
     people = filterAndSort(people, PEOPLE_ORDER, 'stage');
-    contracts = filterAndSort(contracts, CONTRACT_ORDER, 'stage');
+    contracts = foldToSpine(contracts, 'stage');
 
-    // Average rate now sourced from Closed (YTD), not all-time — more representative
-    // of current commission structures than the full multi-year history.
     let avgRate = 0;
-    const closedYtdRow = contracts.find(r => r.stage === 'Closed (YTD)');
-    if (closedYtdRow) {
-      const v = parseFloat(closedYtdRow.value), g = parseFloat(closedYtdRow.gci);
-      if (v > 0 && !isNaN(g)) avgRate = g / v;
+    if (closedYtdGlobal.value > 0 && closedYtdGlobal.gci > 0) {
+      avgRate = closedYtdGlobal.gci / closedYtdGlobal.value;
     }
     avgRateGlobal = avgRate;
 
-    // Apply the dynamic estimate to the earliest pipeline stages (A, B, C) only when
-    // they have no real commission entered yet — by CRM design, commission isn't
-    // entered until later stages, so this fills the gap with a computed rate rather
-    // than showing $0. Track which stage names got the estimate so the Missing Data
-    // list below can skip flagging contracts in those stages as missing commission —
-    // that's expected there, not a real gap.
+    // Commission isn't entered until later stages by CRM design, so early
+    // stages get an estimated GCI rather than showing $0. Keyed on spine
+    // position now, not array index.
     estimatedStageNamesGlobal = new Set();
-    contracts.forEach((s, i) => {
+    contracts.forEach(s => {
       const realGci = fmtInt(s.gci) ? parseFloat(s.gci) : 0;
-      if (i < 3 && s.stage !== 'Closed (YTD)' && realGci === 0 && avgRate > 0) {
+      if (s.pos <= 2 && realGci === 0 && avgRate > 0) {
         const val = fmtInt(s.value) ? parseFloat(s.value) : 0;
         s.gci = Math.round(val * avgRate * 100) / 100;
         s.estimated = true;
@@ -487,12 +538,12 @@ async function loadData(){
     renderGoalGap(contracts);
     await loadMissingData();
 
-    const totalLeads = totalLeadsAll;
-    renderLeadStats(totalLeads, metsRow ? fmtInt(metsRow.count) : 0, nurtureRow ? fmtInt(nurtureRow.count) : 0);
+    renderLeadStats(totalLeadsAll, metsRow ? fmtInt(metsRow.count) : 0, nurtureRow ? fmtInt(nurtureRow.count) : 0);
 
-    setStatus('ok', '');
+    setStatus('ok', 'Connected · <b>' + contracts.reduce((a,s)=>a+fmtInt(s.count),0) + '</b> open contracts');
+    pullTimeEl.textContent = new Date().toLocaleString('en-US');
   } catch (err) {
-    setStatus('err', '');
+    setStatus('err', 'Fetch failed: ' + err.message);
     renderPeopleFunnel([]);
     renderContractFunnel([]);
     renderAllTimeClosed(null, 0);
@@ -503,7 +554,6 @@ async function loadData(){
   }
 }
 
-// --- Shared funnel builder: renders lettered stage list + tapered SVG ---
 function buildFunnel(stages, { listElId, svgElId, hasMoney }){
   const listEl = document.getElementById(listElId);
   const svgWrapEl = document.getElementById(svgElId);
@@ -511,20 +561,22 @@ function buildFunnel(stages, { listElId, svgElId, hasMoney }){
   svgWrapEl.innerHTML = '';
 
   if (!stages.length) {
-    listEl.innerHTML = `<div class="empty-state">No data yet — connect a CSV URL above.</div>`;
+    listEl.innerHTML = `<div class="empty-state">No data yet.</div>`;
     return;
   }
 
   const letters = "ABCDEFGHIJKLMNOP";
   const colored = stages.map((s, i) => ({ ...s, letter: letters[i] || '?', color: PALETTE[i % PALETTE.length] }));
 
-  // --- Left column: lettered stage list ---
   colored.forEach(s=>{
     const block = document.createElement('div');
     block.className = 'stage-block';
     const count = fmtInt(s.count);
-    const rollupList = s.otherNames ? `<div class="rollup-list">${s.otherNames.join(', ')}</div>` : '';
-    const breakdownList = s.breakdown ? `<div class="rollup-list">${s.breakdown.map(b => `${b.name}: ${b.count}`).join(' · ')}</div>` : '';
+    const breakdownList = (s.breakdown && s.breakdown.length)
+      ? `<div class="rollup-list">${s.breakdown.map(b => `${b.name}: ${b.count}`).join(' · ')}</div>` : '';
+    const sideSplit = (hasMoney && (s.buyer || s.seller))
+      ? `<span class="side-split">${s.buyer} buy · ${s.seller} sell</span>` : '';
+
     if (hasMoney) {
       const value = fmtInt(s.value) ? parseFloat(s.value) : 0;
       const gci = fmtInt(s.gci) ? parseFloat(s.gci) : 0;
@@ -533,7 +585,7 @@ function buildFunnel(stages, { listElId, svgElId, hasMoney }){
       block.innerHTML = `
         <div class="letter" style="background:${s.color}">${s.letter}</div>
         <div class="stage-body">
-          <div class="stage-title-row"><span class="stage-title">${s.stage}</span></div>
+          <div class="stage-title-row"><span class="stage-title">${s.stage}</span>${sideSplit}</div>
           <div class="value-row">
             <span class="value-big" style="color:${s.color}">${fmtMoney(value)}</span>
             <span class="value-count">${count} contract${count===1?'':'s'}${missingV>0 ? ` · ${missingV} missing value` : ''}</span>
@@ -544,7 +596,7 @@ function buildFunnel(stages, { listElId, svgElId, hasMoney }){
             ${s.estimated ? `<span class="estimate-tag">at ${(avgRateGlobal*100).toFixed(2)}% avg closed rate</span>` : ''}
             ${(!s.estimated && missingC>0) ? `<span class="gci-warn">${missingC} missing commission</span>` : ''}
           </div>
-          ${rollupList}${breakdownList}
+          ${breakdownList}
         </div>
       `;
     } else {
@@ -553,14 +605,13 @@ function buildFunnel(stages, { listElId, svgElId, hasMoney }){
         <div class="stage-body">
           <div class="stage-title-row"><span class="stage-title">${s.stage}</span></div>
           <div class="value-row"><span class="value-big" style="color:${s.color}">${count}</span><span class="value-count">contact${count===1?'':'s'}</span></div>
-          ${rollupList}${breakdownList}
+          ${breakdownList}
         </div>
       `;
     }
     listEl.appendChild(block);
   });
 
-  // --- Right column: tapered SVG funnel, widths ∝ count ---
   const maxCount = Math.max(...colored.map(s => fmtInt(s.count)), 1);
   const minW = 70, maxW = 320;
   const widths = colored.map(s => {
@@ -599,8 +650,7 @@ function renderContractFunnel(contracts){
 }
 
 function renderLeadStats(totalLeads, mets, nurture){
-  const el = document.getElementById('lead-stats-box');
-  el.innerHTML = `
+  document.getElementById('lead-stats-box').innerHTML = `
     <div class="alltime-box">
       <div>
         <div class="lbl">Total Leads</div>
@@ -610,12 +660,12 @@ function renderLeadStats(totalLeads, mets, nurture){
       <div>
         <div class="lbl">Mets</div>
         <div class="big">${mets}</div>
-        <div class="sub">SOI / past clients / met database — tag-matched, unverified*</div>
+        <div class="sub">SOI / past clients — tag-matched, unverified</div>
       </div>
       <div>
         <div class="lbl">Nurture</div>
         <div class="big">${nurture}</div>
-        <div class="sub">outside the pipeline — not actively being worked</div>
+        <div class="sub">outside the pipeline — not actively worked</div>
       </div>
     </div>
   `;
@@ -624,10 +674,10 @@ function renderLeadStats(totalLeads, mets, nurture){
 function renderAllTimeClosed(row, avgRate){
   const el = document.getElementById('alltime-closed-box');
   if (!row) { el.innerHTML = ''; return; }
-  const value = fmtInt(row.value) ? parseFloat(row.value) : 0;
-  const gci = fmtInt(row.gci) ? parseFloat(row.gci) : 0;
-  const count = fmtInt(row.count);
-  const missingC = fmtInt(row.missing_commission);
+  const value = row.value || 0;
+  const gci = row.gci || 0;
+  const count = row.count || 0;
+  const missingC = row.missing_commission || 0;
   el.innerHTML = `
     <div class="alltime-box">
       <div>
@@ -648,12 +698,9 @@ function renderGoalGap(contracts){
   const el = document.getElementById('goal-gap-box');
   if (!contracts || !contracts.length) { el.innerHTML = ''; return; }
 
-  const closedYtdRow = contracts.find(r => r.stage === 'Closed (YTD)');
-  const actualDeals = closedYtdRow ? fmtInt(closedYtdRow.count) : 0;
-  const actualGci = closedYtdRow && fmtInt(closedYtdRow.gci) ? parseFloat(closedYtdRow.gci) : 0;
+  const actualDeals = closedYtdGlobal.count;
+  const actualGci = closedYtdGlobal.gci;
 
-  // Dollar goal derived from real trailing avg GCI/deal, not a guessed number —
-  // stays in sync with your actual commission structure automatically.
   const avgDealGci = actualDeals > 0 ? actualGci / actualDeals : 0;
   const annualGciGoal = ANNUAL_DEAL_GOAL * avgDealGci;
 
@@ -666,27 +713,24 @@ function renderGoalGap(contracts){
 
   const expectedDeals = ANNUAL_DEAL_GOAL * yearFraction;
   const expectedGci = annualGciGoal * yearFraction;
-  const paceGapDeals = expectedDeals - actualDeals; // positive = behind pace
+  const paceGapDeals = expectedDeals - actualDeals;
   const paceGapGci = expectedGci - actualGci;
 
-  // Weighted pipeline projection — sums count/value across every open stage that
-  // has a probability assigned in STAGE_CLOSE_PROBABILITY above.
-  let weightedDeals = 0, weightedGci = 0, weightedContractCount = 0;
+  let weightedDeals = 0, weightedGci = 0, openCount = 0, terminatedCount = 0;
   contracts.forEach(s => {
-    if (s.stage === 'Closed (YTD)') return;
-    const prob = STAGE_CLOSE_PROBABILITY[s.stage];
-    if (prob === undefined) return;
+    if (s.stage === 'Terminated') { terminatedCount += fmtInt(s.count); return; }
+    const prob = SPINE_PROB[s.stage];
+    if (prob === undefined || prob >= 1) return;
     const count = fmtInt(s.count);
     const value = fmtInt(s.value) ? parseFloat(s.value) : 0;
     weightedDeals += count * prob;
     weightedGci += value * avgRateGlobal * prob;
-    weightedContractCount += count;
+    openCount += count;
   });
 
   const projectedDeals = actualDeals + weightedDeals;
   const projectedGci = actualGci + weightedGci;
-  const projGapDeals = ANNUAL_DEAL_GOAL - projectedDeals; // positive = short of goal
-
+  const projGapDeals = ANNUAL_DEAL_GOAL - projectedDeals;
   const pacePct = Math.min(100, expectedDeals > 0 ? (actualDeals / expectedDeals) * 100 : 0);
   const projPct = Math.min(100, (projectedDeals / ANNUAL_DEAL_GOAL) * 100);
   const projColor = projGapDeals > 0.05 ? '#C24B3F' : '#4B8A5E';
@@ -719,28 +763,114 @@ function renderGoalGap(contracts){
           <span class="goal-metric-label">Projected GCI</span>
           <span class="goal-metric-value">${fmtMoney(projectedGci)} <span class="of">/ ${fmtMoney(annualGciGoal)} goal</span></span>
         </div>
-        <div class="goal-note">${actualDeals} closed + ${weightedDeals.toFixed(1)} probability-weighted from ${weightedContractCount} open pipeline contracts. Weights are assumptions — edit STAGE_CLOSE_PROBABILITY in the script to tune as real close rates come in.</div>
+        <div class="goal-note">${actualDeals} closed + ${weightedDeals.toFixed(1)} weighted from ${openCount} open contracts${terminatedCount ? ` · ${terminatedCount} terminated, excluded` : ''}. Weights are assumptions until Stage Conversion reports reliable.</div>
       </div>
     </div>
   `;
 }
+
+// ============================================================
+// STAGE CONVERSION
+// ============================================================
+
+async function loadFunnel(){
+  const url = getStoredFunnelUrl();
+  const el = document.getElementById('conversion-table');
+  const sub = document.getElementById('conv-sub');
+
+  if (!url || url.indexOf('PASTE_') === 0){
+    sub.textContent = 'not connected';
+    el.innerHTML = `<div class="empty-state">Publish the <b>Stage_Funnel</b> tab as CSV and set <code>DEFAULT_FUNNEL_URL</code> near the top of the script.</div>`;
+    return;
+  }
+
+  try {
+    const res = await fetch(url + (url.indexOf('?')>-1?'&':'?') + 'cachebust=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const table = parseCSV(await res.text());
+    if (table.length < 2) {
+      funnelRowsGlobal = [];
+      renderConversion('all');
+      return;
+    }
+    const headers = table[0];
+    funnelRowsGlobal = table.slice(1).map(r => {
+      const o = {}; headers.forEach((h,i) => o[h] = r[i]); return o;
+    });
+    renderConversion('all');
+  } catch (err) {
+    sub.textContent = '';
+    el.innerHTML = `<div class="empty-state">Fetch failed: ${err.message}. Confirm <b>Stage_Funnel</b> is published as CSV.</div>`;
+  }
+}
+
+function renderConversion(side){
+  const el = document.getElementById('conversion-table');
+  const sub = document.getElementById('conv-sub');
+  const rows = funnelRowsGlobal.filter(r => r.side === side)
+    .sort((a,b) => parseInt(a.pos) - parseInt(b.pos));
+
+  if (!rows.length){
+    sub.textContent = 'no transition data yet';
+    el.innerHTML = `<div class="empty-state">
+      No stage transitions logged yet.<br>
+      Conversion accrues as contracts move through the TSG spine. Median days
+      populate first — roughly 90 days. Conversion rates need n≥30 per stage,
+      closer to 8 months at current deal volume.
+    </div>`;
+    return;
+  }
+
+  const term = rows[0].terminated_count || 0;
+  const anyReliable = rows.some(r => r.reliable === 'yes');
+  sub.textContent = `${side} · ${term} terminated · ${anyReliable ? 'partially reliable' : 'directional only, n below threshold'}`;
+
+  let html = `<div class="conv-table">
+    <div class="conv-row head">
+      <span class="conv-pos"></span>
+      <span class="conv-stage">Stage</span>
+      <span class="conv-num">Reached</span>
+      <span class="conv-num">→ Next</span>
+      <span class="conv-num">Close</span>
+      <span class="conv-num">Median</span>
+    </div>`;
+
+  rows.forEach(r => {
+    const thin = r.reliable !== 'yes' && parseInt(r.reached) > 0;
+    html += `<div class="conv-row">
+      <span class="conv-pos">${r.pos}</span>
+      <span class="conv-stage">${r.stage}${thin ? `<span class="conv-thin">n=${r.reached}</span>` : ''}</span>
+      <span class="conv-num">${r.reached}</span>
+      <span class="conv-num ${r.conversion === '' ? 'dim' : ''}">${r.conversion === '' ? '—' : r.conversion + '%'}</span>
+      <span class="conv-num ${r.close_rate === '' ? 'dim' : ''}">${r.close_rate === '' ? '—' : r.close_rate + '%'}</span>
+      <span class="conv-num ${r.median_days === '' ? 'dim' : ''}">${r.median_days === '' ? '—' : r.median_days + 'd'}</span>
+    </div>`;
+  });
+
+  el.innerHTML = html + `</div>`;
+}
+
+document.querySelectorAll('.conv-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.conv-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderConversion(btn.dataset.side);
+  });
+});
+
+// ============================================================
+// MISSING DATA
+// ============================================================
 
 async function loadMissingData(){
   const tableEl = document.getElementById('missing-data-table');
   const subEl = document.getElementById('missing-count-sub');
   const url = getStoredRawUrl();
 
-  if (!url) {
-    subEl.textContent = 'paste a Raw_Contracts CSV URL above to see this';
-    tableEl.innerHTML = `<div class="empty-state">Not connected — publish Raw_Contracts and paste its CSV URL above.</div>`;
-    return;
-  }
-
   try {
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    const table = parseCSV(text);
+    const table = parseCSV(await res.text());
     if (!table.length) throw new Error('CSV came back empty');
 
     const headers = table[0];
@@ -752,26 +882,29 @@ async function loadMissingData(){
       .map(r => {
         const flags = [];
         const stage = r.primaryPipelineStageName || '';
+        const spineStage = toSpine(stage);
         const valEmpty = r.contractValue === '' || r.contractValue === undefined;
         const gciEmpty = r.totalCommission === '' || r.totalCommission === undefined;
-        const isEstimatedStage = estimatedStageNamesGlobal.has(stage);
+        const addrEmpty = (r.propertyAddressFull === '' || r.propertyAddressFull === undefined)
+          && (r.propertyStreet === '' || r.propertyStreet === undefined);
+        const isEstimatedStage = estimatedStageNamesGlobal.has(spineStage);
         if (valEmpty) flags.push('value');
-        // Missing commission isn't a real gap in stages currently using the dynamic
-        // estimate — that's expected there by CRM design, not something to fix.
         if (gciEmpty && !isEstimatedStage) flags.push('commission');
+        // Address gaps only matter for deals that will reach the sold map.
+        if (addrEmpty && SPINE_POS[spineStage] >= 6) flags.push('address');
         return { id: r.id, name: r.name || '(unnamed)', stage, flags };
       })
       .filter(r => r.flags.length > 0 && r.id);
 
-    subEl.textContent = `${missing.length} contract${missing.length===1?'':'s'} · value or commission not entered`;
+    subEl.textContent = `${missing.length} contract${missing.length===1?'':'s'} · value, commission, or address not entered`;
 
     if (!missing.length) {
-      tableEl.innerHTML = `<div class="empty-state">Nothing missing — every contract has value and commission entered.</div>`;
+      tableEl.innerHTML = `<div class="empty-state">Nothing missing.</div>`;
       return;
     }
 
-    const table_ = document.createElement('div');
-    table_.className = 'missing-table';
+    const wrap = document.createElement('div');
+    wrap.className = 'missing-table';
     missing.forEach(m => {
       const row = document.createElement('div');
       row.className = 'missing-row';
@@ -781,13 +914,13 @@ async function loadMissingData(){
         <span class="missing-flags">${badges}</span>
         <a class="fix-link" target="_blank" rel="noopener" href="https://suresend.ai/contracts/${m.id}">Fix ↗</a>
       `;
-      table_.appendChild(row);
+      wrap.appendChild(row);
     });
     tableEl.innerHTML = '';
-    tableEl.appendChild(table_);
+    tableEl.appendChild(wrap);
   } catch (err) {
     subEl.textContent = '';
-    tableEl.innerHTML = `<div class="empty-state">Fetch failed: ${err.message}. Confirm you published <b>Raw_Contracts</b> specifically as CSV.</div>`;
+    tableEl.innerHTML = `<div class="empty-state">Fetch failed: ${err.message}. Confirm <b>Raw_Contracts</b> is published as CSV.</div>`;
   }
 }
 
@@ -814,11 +947,6 @@ function sideColor(side){
   if (side === 'seller') return SELLER_COLOR;
   return OTHER_COLOR;
 }
-function sideLabel(side){
-  if (side === 'buyer') return 'Buyer side';
-  if (side === 'seller') return 'Seller side';
-  return 'Other';
-}
 function fmtSoldDate(v){
   if(!v) return '—';
   const d = new Date(v);
@@ -835,12 +963,6 @@ function makeSoldPin(color){
 
 function initSoldMapSetup(){
   const el = document.getElementById('sold-map');
-  const subEl = document.getElementById('sold-count-sub');
-
-  if (SOLD_PROPERTIES_CSV_URL.indexOf('PASTE_YOUR') === 0 || GOOGLE_MAPS_API_KEY.indexOf('PASTE_YOUR') === 0){
-    el.innerHTML = `<div class="empty-state" style="padding-top:170px;">Set <code>SOLD_PROPERTIES_CSV_URL</code> and <code>GOOGLE_MAPS_API_KEY</code> near the top of the script to enable this map.</div>`;
-    return;
-  }
   if (soldMapsScriptRequested) return;
   soldMapsScriptRequested = true;
 
@@ -879,13 +1001,13 @@ async function loadSoldProperties(){
 
   try {
     const res = await fetch(SOLD_PROPERTIES_CSV_URL + (SOLD_PROPERTIES_CSV_URL.indexOf('?')>-1?'&':'?') + 'cachebust=' + Date.now());
-    const text = await res.text();
-    const rows = parseCSV(text);
+    const rows = parseCSV(await res.text());
     if (rows.length < 2){ listEl.innerHTML = `<div class="empty-state">No sold properties yet.</div>`; return; }
     const headers = rows[0].map(h => h.trim());
     const idx = {
       address: headers.indexOf('Address'), lat: headers.indexOf('Lat'), lng: headers.indexOf('Lng'),
-      closedDate: headers.indexOf('ClosedDate'), value: headers.indexOf('ContractValue'), contractType: headers.indexOf('ContractType'),
+      closedDate: headers.indexOf('ClosedDate'), value: headers.indexOf('ContractValue'),
+      contractType: headers.indexOf('ContractType'),
     };
     const props = rows.slice(1)
       .filter(r => r[idx.lat] && r[idx.lng])
@@ -898,8 +1020,7 @@ async function loadSoldProperties(){
 
     if (!props.length){
       listEl.innerHTML = `<div class="empty-state">No geocoded properties yet.</div>`;
-      subEl.textContent = '';
-      keyBarEl.innerHTML = '';
+      subEl.textContent = ''; keyBarEl.innerHTML = '';
       return;
     }
 
@@ -960,8 +1081,9 @@ function focusSoldMarker(i){
 
 initSoldMapSetup();
 
-refreshBtn.addEventListener('click', () => { loadData(); });
+refreshBtn.addEventListener('click', () => { loadData(); loadFunnel(); });
 loadData();
+loadFunnel();
 </script>
 </body>
 </html>
