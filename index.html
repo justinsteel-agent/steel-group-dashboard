@@ -768,11 +768,17 @@ function renderLeadStats(s){
 
 function renderAllTimeClosed(row, avgRate){
   const el = document.getElementById('alltime-closed-box');
-  if (!row) { el.innerHTML = ''; return; }
-  const value = row.value || 0;
-  const gci = row.gci || 0;
-  const count = row.count || 0;
-  const missingC = row.missing_commission || 0;
+  const value = row ? (row.value || 0) : 0;
+  const gci = row ? (row.gci || 0) : 0;
+  const count = row ? (row.count || 0) : 0;
+  const missingC = row ? (row.missing_commission || 0) : 0;
+
+  // YTD gets its own cards. It previously only surfaced inside Gap to Goal,
+  // so a zero there was indistinguishable from the section not rendering.
+  const y = closedYtdGlobal || { count: 0, value: 0, gci: 0 };
+  const yr = new Date().getFullYear();
+  const ytdEmpty = !y.count;
+
   el.innerHTML = `
     <div class="alltime-box">
       <div>
@@ -783,7 +789,17 @@ function renderAllTimeClosed(row, avgRate){
       <div>
         <div class="lbl">All-Time GCI</div>
         <div class="big">${fmtMoney(gci)}</div>
-        <div class="sub">${missingC>0 ? `${missingC} missing commission` : 'YTD avg rate: ' + (avgRate*100).toFixed(2) + '%'}</div>
+        <div class="sub">${missingC>0 ? `${missingC} missing commission` : 'avg rate ' + (avgRate*100).toFixed(2) + '%'}</div>
+      </div>
+      <div>
+        <div class="lbl">Closed ${yr}</div>
+        <div class="big" ${ytdEmpty ? 'style="color:#C24B3F"' : ''}>${fmtMoney(y.value)}</div>
+        <div class="sub">${y.count} contract${y.count===1?'':'s'} closed this year</div>
+      </div>
+      <div>
+        <div class="lbl">GCI ${yr}</div>
+        <div class="big" ${ytdEmpty ? 'style="color:#C24B3F"' : ''}>${fmtMoney(y.gci)}</div>
+        <div class="sub">${ytdEmpty ? 'no ' + yr + ' closings found — check actualClosingDate' : 'feeds Gap to Goal'}</div>
       </div>
     </div>
   `;
