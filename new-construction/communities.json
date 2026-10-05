@@ -117,7 +117,16 @@
         "builder": "https://www.meritagehomes.com/state/sc/myrtle-beach/crown-pointe"
       },
       "last_verified": "2026-10-05",
-      "stale": false
+      "stale": false,
+      "media": {
+        "hero": null,
+        "streetscape": null,
+        "model_exterior": null,
+        "amenity": null,
+        "interior": null,
+        "lots": null,
+        "context": null
+      }
     },
     {
       "id": "toll-brothers-at-sayebrook",
@@ -265,7 +274,16 @@
         "builder": "https://www.tollbrothers.com/luxury-homes-for-sale/South-Carolina/Toll-Brothers-at-SayeBrook"
       },
       "last_verified": "2026-10-05",
-      "stale": false
+      "stale": false,
+      "media": {
+        "hero": null,
+        "streetscape": null,
+        "model_exterior": null,
+        "amenity": null,
+        "interior": null,
+        "lots": null,
+        "context": null
+      }
     }
   ]
 }

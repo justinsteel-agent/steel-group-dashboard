@@ -26,6 +26,8 @@
   .card{background:var(--white);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;transition:border-color .15s}
   .card.active{border-color:var(--brass);box-shadow:0 0 0 2px rgba(176,141,87,.25)}
   .card h3{margin:0 0 2px;font-size:20px}
+  .hero{aspect-ratio:16/9;width:100%;border-radius:4px;background:var(--paper);border:1px solid var(--rule);margin-bottom:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;overflow:hidden}
+  .hero img{width:100%;height:100%;object-fit:cover;display:block}
   .card .sub{color:var(--muted);font-size:12px;margin-bottom:8px}
   .facts{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:13px;margin:8px 0}
   .facts b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
@@ -104,7 +106,9 @@
   document.getElementById('reset').addEventListener('click',()=>{Object.assign(state,{county:'',price:'',builder:'',type:'',timing:'',district:''});state.chips.clear();document.querySelectorAll('#filters select').forEach(s=>s.value='');document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));render()});
   function card(c){
     const q=c.quick_move_ins||{};const fp=(c.floor_plans||[]).filter(p=>p.sqft);const stale=(c.stale?' · <span style="color:#b45309">verification pending</span>':'')+(c.geo_precision==='approximate'?' · pin approximate':'');
+    const hero=c.media&&c.media.hero;
     return `<div class="card" id="card-${c.id}" data-id="${c.id}">
+      <div class="hero">${hero?`<img src="${hero}" alt="${c.name} entrance" loading="lazy">`:'Entrance photo — on the next mission'}</div>
       <h3>${c.name}</h3>
       <div class="sub">${c.builder} · ${c.city}, ${c.county} County</div>
       ${(c.home_types||[]).map(t=>`<span class="badge">${t.replace('-',' ')}</span>`).join('')}${c.features&&c.features.age_55_plus?'<span class="badge">55+</span>':''}
