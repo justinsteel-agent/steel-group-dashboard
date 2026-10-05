@@ -45,16 +45,16 @@
 <body>
 <div class="wrap">
   <div class="filters" id="filters">
-    <select id="f-county"><option value="">All counties</option><option>Horry</option><option>Georgetown</option></select>
-    <select id="f-price"><option value="">Any price</option><option value="0-300000">Under $300K</option><option value="300000-400000">$300K–$400K</option><option value="400000-500000">$400K–$500K</option><option value="500000-750000">$500K–$750K</option><option value="750000-99999999">$750K+</option></select>
+    <select id="f-county"><option value="">All counties</option></select>
+    <select id="f-price"><option value="">Any price</option></select>
     <select id="f-builder"><option value="">All builders</option></select>
-    <select id="f-type"><option value="">All home types</option><option value="single-family">Single-family</option><option value="townhome">Townhome</option></select>
-    <select id="f-timing"><option value="">Any move timing</option><option value="now">Available now</option><option value="0-90">0–90 days</option><option value="3-6">3–6 months</option><option value="plan">Build from a plan</option></select>
+    <select id="f-type"><option value="">All home types</option></select>
+    <select id="f-timing"><option value="">Any move timing</option></select>
     <select id="f-district"><option value="">Any school district</option></select>
     <div class="chips" id="chips">
       <span class="chip" data-f="age_55_plus">55+</span><span class="chip" data-f="gated">Gated</span><span class="chip" data-f="pool">Pool</span><span class="chip" data-f="golf">Golf</span><span class="chip" data-f="waterfront">Waterfront</span>
     </div>
-    <span class="count" id="count"></span>
+    <button id="reset" type="button">Reset</button><span class="count" id="count"></span>
   </div>
   <div class="layout">
     <div id="map"></div>
@@ -68,27 +68,42 @@
   const txt = v => (v==null||v==='') ? 'Awaiting data' : v;
   const res = await fetch(DATA_URL+'?v='+Date.now()); const db = await res.json();
   const all = db.communities.filter(c=>c.status!=='closed');
-  const builders=[...new Set(all.map(c=>c.builder))].sort(); const districts=[...new Set(all.map(c=>c.schools&&c.schools.district).filter(Boolean))].sort();
-  for(const b of builders) document.getElementById('f-builder').insertAdjacentHTML('beforeend',`<option>${b}</option>`);
-  for(const d of districts) document.getElementById('f-district').insertAdjacentHTML('beforeend',`<option>${d}</option>`);
+  const PRICE_BANDS=[['0-300000','Under $300K'],['300000-400000','$300K–$400K'],['400000-500000','$400K–$500K'],['500000-750000','$500K–$750K'],['750000-99999999','$750K+']];
+  const TIMING=[['now','Available now'],['0-90','0–90 days'],['3-6','3–6 months'],['plan','Build from a plan']];
+  const TYPES=[['single-family','Single-family'],['townhome','Townhome'],['condo','Condo']];
+  const inBand=(p,b)=>{const [lo,hi]=b.split('-').map(Number);return p!=null&&p>=lo&&p<hi};
+  const uniq=a=>[...new Set(a.filter(Boolean))].sort();
+  function fill(id,pairs,count){const sel=document.getElementById(id);const keep=sel.value;[...sel.options].slice(1).forEach(o=>o.remove());for(const [v,l] of pairs){const n=count(v);if(!n)continue;sel.insertAdjacentHTML('beforeend',`<option value="${v}">${l} (${n})</option>`)}sel.value=[...sel.options].some(o=>o.value===keep)?keep:''}
+  function fillAll(){
+    fill('f-county',uniq(all.map(c=>c.county)).map(x=>[x,x+' County']),v=>all.filter(c=>c.county===v).length);
+    fill('f-price',PRICE_BANDS,v=>all.filter(c=>inBand(c.starting_price,v)).length);
+    fill('f-builder',uniq(all.map(c=>c.builder)).map(x=>[x,x]),v=>all.filter(c=>c.builder===v).length);
+    fill('f-type',TYPES,v=>all.filter(c=>(c.home_types||[]).includes(v)).length);
+    fill('f-timing',TIMING,v=>all.filter(c=>(c.move_timing||[]).includes(v)).length);
+    fill('f-district',uniq(all.map(c=>c.schools&&c.schools.district)).map(x=>[x,x]),v=>all.filter(c=>c.schools&&c.schools.district===v).length);
+    document.querySelectorAll('.chip').forEach(ch=>{const f=ch.dataset.f;const n=all.filter(c=>c.features&&c.features[f]===true).length;ch.style.display=n?'':'none';ch.dataset.n=n});
+  }
+  fillAll();
   const map = new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/positron',center:[-79.05,33.6],zoom:9,attributionControl:true});
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
   let markers=[]; let activeId=null;
   const state={county:'',price:'',builder:'',type:'',timing:'',district:'',chips:new Set()};
   document.querySelectorAll('#filters select').forEach(s=>s.addEventListener('change',()=>{state[s.id.slice(2)]=s.value;render()}));
   document.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{ch.classList.toggle('on');const f=ch.dataset.f;state.chips.has(f)?state.chips.delete(f):state.chips.add(f);render()}));
+  // Unknown (null) never excludes a community; only a known mismatch does.
   function pass(c){
-    if(state.county&&c.county!==state.county)return false;
+    if(state.county&&c.county&&c.county!==state.county)return false;
     if(state.builder&&c.builder!==state.builder)return false;
-    if(state.type&&!(c.home_types||[]).includes(state.type))return false;
-    if(state.timing&&!(c.move_timing||[]).includes(state.timing))return false;
-    if(state.district&&(!c.schools||c.schools.district!==state.district))return false;
-    if(state.price){const [lo,hi]=state.price.split('-').map(Number);const p=c.starting_price;if(p==null||p<lo||p>hi)return false}
-    for(const f of state.chips){if(!(c.features&&c.features[f]))return false}
+    if(state.type&&c.home_types&&c.home_types.length&&!c.home_types.includes(state.type))return false;
+    if(state.timing&&c.move_timing&&c.move_timing.length&&!c.move_timing.includes(state.timing))return false;
+    if(state.district&&c.schools&&c.schools.district&&c.schools.district!==state.district)return false;
+    if(state.price&&c.starting_price!=null&&!inBand(c.starting_price,state.price))return false;
+    for(const f of state.chips){const v=c.features&&c.features[f];if(v===false)return false}
     return true;
   }
+  document.getElementById('reset').addEventListener('click',()=>{Object.assign(state,{county:'',price:'',builder:'',type:'',timing:'',district:''});state.chips.clear();document.querySelectorAll('#filters select').forEach(s=>s.value='');document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));render()});
   function card(c){
-    const q=c.quick_move_ins||{};const fp=(c.floor_plans||[]).filter(p=>p.sqft);const stale=c.stale?' · <span style="color:#b45309">verification pending</span>':'';
+    const q=c.quick_move_ins||{};const fp=(c.floor_plans||[]).filter(p=>p.sqft);const stale=(c.stale?' · <span style="color:#b45309">verification pending</span>':'')+(c.geo_precision==='approximate'?' · pin approximate':'');
     return `<div class="card" id="card-${c.id}" data-id="${c.id}">
       <h3>${c.name}</h3>
       <div class="sub">${c.builder} · ${c.city}, ${c.county} County</div>
@@ -103,8 +118,8 @@
         <div style="grid-column:1/-1"><b>Schools</b>${c.schools?`${txt(c.schools.elementary)} · ${txt(c.schools.middle)} · ${txt(c.schools.high)}`:'Awaiting data'}</div>
       </div>
       <div class="actions">
-        <a class="btn" href="${c.guide_url}" target="_top">Community guide</a>
-        <a class="btn primary" href="${c.guide_url}#tour" target="_top">Tour with representation</a>
+        ${c.guide_url?`<a class="btn" href="${c.guide_url}" target="_top">Community guide</a>`:`<span class="btn" style="opacity:.55;cursor:default">Guide coming soon</span>`}
+        <a class="btn primary" href="${c.guide_url?c.guide_url+'#tour':'https://thesteel.group/new-construction/#tour'}" target="_top">Tour with representation</a>
       </div>
       <div class="verified">Last verified ${c.last_verified||'—'}${stale}</div>
     </div>`;
@@ -113,7 +128,7 @@
     const list=all.filter(pass);
     document.getElementById('count').textContent=`${list.length} communit${list.length===1?'y':'ies'}`;
     const el=document.getElementById('cards');
-    el.innerHTML=list.length?list.map(card).join(''):'<div class="empty">No communities match these filters yet. More are added weekly.</div>';
+    el.innerHTML=list.length?list.map(card).join(''):'<div class="empty">No community matches every filter you picked. Clear one, or hit Reset — every community we track is listed when no filters are set.</div>';
     markers.forEach(m=>m.remove());markers=[];
     const b=new maplibregl.LngLatBounds();
     list.forEach(c=>{if(c.lat==null)return;const d=document.createElement('div');d.className='pin';d.dataset.id=c.id;

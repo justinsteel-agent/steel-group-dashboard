@@ -21,7 +21,9 @@
       "lng": -79.3183,
       "status": "selling",
       "guide_url": "https://thesteel.group/explore-areas/georgetown/crown-pointe/",
-      "home_types": ["single-family"],
+      "home_types": [
+        "single-family"
+      ],
       "starting_price": 299990,
       "price_max": 374990,
       "sqft_min": 1542,
@@ -31,7 +33,9 @@
       "total_homesites": null,
       "remaining_runway": null,
       "hoa_monthly": null,
-      "amenities": ["pool"],
+      "amenities": [
+        "pool"
+      ],
       "features": {
         "age_55_plus": false,
         "gated": false,
@@ -39,16 +43,66 @@
         "golf": false,
         "waterfront": false
       },
-      "move_timing": ["now", "0-90", "plan"],
-      "quick_move_ins": { "count": 9, "price_min": 299990, "price_max": 354990 },
+      "move_timing": [
+        "now",
+        "0-90",
+        "plan"
+      ],
+      "quick_move_ins": {
+        "count": 9,
+        "price_min": 299990,
+        "price_max": 354990
+      },
       "incentives": null,
       "floor_plans": [
-        { "name": "Buchanan", "sqft": 1542, "beds": 3, "baths": 2, "base_price": 299990, "stories": 1 },
-        { "name": "Chandler", "sqft": 1648, "beds": 3, "baths": 2, "base_price": 309990, "stories": 1 },
-        { "name": "Newport", "sqft": 1835, "beds": 4, "baths": 2, "base_price": 324990, "stories": 1 },
-        { "name": "Gibson", "sqft": 2001, "beds": 4, "baths": 3, "base_price": 339990, "stories": 1 },
-        { "name": "Finley", "sqft": null, "beds": null, "baths": null, "base_price": null, "stories": null },
-        { "name": "Zimmerman", "sqft": null, "beds": null, "baths": null, "base_price": null, "stories": null }
+        {
+          "name": "Buchanan",
+          "sqft": 1542,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 299990,
+          "stories": 1
+        },
+        {
+          "name": "Chandler",
+          "sqft": 1648,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 309990,
+          "stories": 1
+        },
+        {
+          "name": "Newport",
+          "sqft": 1835,
+          "beds": 4,
+          "baths": 2,
+          "base_price": 324990,
+          "stories": 1
+        },
+        {
+          "name": "Gibson",
+          "sqft": 2001,
+          "beds": 4,
+          "baths": 3,
+          "base_price": 339990,
+          "stories": 1
+        },
+        {
+          "name": "Finley",
+          "sqft": null,
+          "beds": null,
+          "baths": null,
+          "base_price": null,
+          "stories": null
+        },
+        {
+          "name": "Zimmerman",
+          "sqft": null,
+          "beds": null,
+          "baths": null,
+          "base_price": null,
+          "stories": null
+        }
       ],
       "schools": {
         "district": "Georgetown County School District",
@@ -61,6 +115,154 @@
       "sources": {
         "primary": "https://www.newhomesource.com/community/sc/georgetown/crown-pointe-by-meritage-homes/223002",
         "builder": "https://www.meritagehomes.com/state/sc/myrtle-beach/crown-pointe"
+      },
+      "last_verified": "2026-10-05",
+      "stale": false
+    },
+    {
+      "id": "toll-brothers-at-sayebrook",
+      "name": "Toll Brothers at SayeBrook",
+      "builder": "Toll Brothers",
+      "county": "Horry",
+      "city": "Myrtle Beach",
+      "address": "1139 Milford Way, Myrtle Beach, SC 29588",
+      "lat": 33.642,
+      "lng": -78.9765,
+      "geo_precision": "approximate",
+      "status": "selling",
+      "guide_url": null,
+      "home_types": [
+        "single-family"
+      ],
+      "starting_price": 464995,
+      "price_max": 559000,
+      "sqft_min": 2115,
+      "sqft_max": 2994,
+      "beds_min": 3,
+      "beds_max": 5,
+      "total_homesites": null,
+      "remaining_runway": null,
+      "hoa_monthly": null,
+      "amenities": [
+        "pool",
+        "pickleball",
+        "pond",
+        "event lawn",
+        "fire pit",
+        "parks",
+        "playground",
+        "walking trails"
+      ],
+      "features": {
+        "age_55_plus": false,
+        "gated": null,
+        "pool": true,
+        "golf": false,
+        "waterfront": false
+      },
+      "move_timing": [
+        "now",
+        "plan"
+      ],
+      "quick_move_ins": {
+        "count": 1,
+        "price_min": 559000,
+        "price_max": 559000
+      },
+      "incentives": null,
+      "floor_plans": [
+        {
+          "name": "Hayleigh",
+          "sqft": 2135,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 464995,
+          "stories": null
+        },
+        {
+          "name": "Darla",
+          "sqft": 2115,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 474995,
+          "stories": null
+        },
+        {
+          "name": "Osman",
+          "sqft": 2189,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 485995,
+          "stories": null
+        },
+        {
+          "name": "Waccamaw",
+          "sqft": 2156,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 494995,
+          "stories": null
+        },
+        {
+          "name": "Lanie",
+          "sqft": 2751,
+          "beds": 3,
+          "baths": 3,
+          "base_price": 500995,
+          "stories": null
+        },
+        {
+          "name": "Olan",
+          "sqft": 2551,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 505995,
+          "stories": null
+        },
+        {
+          "name": "Surfside",
+          "sqft": 2398,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 519995,
+          "stories": null
+        },
+        {
+          "name": "Kingstree",
+          "sqft": 2795,
+          "beds": 4,
+          "baths": 3,
+          "base_price": 524995,
+          "stories": null
+        },
+        {
+          "name": "Persimmon",
+          "sqft": 2994,
+          "beds": 4,
+          "baths": 3,
+          "base_price": 545995,
+          "stories": null
+        },
+        {
+          "name": "Rory",
+          "sqft": 2947,
+          "beds": 3,
+          "baths": 2,
+          "base_price": 549995,
+          "stories": null
+        }
+      ],
+      "schools": {
+        "district": "Horry County Schools",
+        "elementary": null,
+        "middle": null,
+        "high": null,
+        "source_url": "https://www.horrycountyschools.net/"
+      },
+      "mls_subdivision": "SayeBrook",
+      "sources": {
+        "primary": "https://www.newhomesource.com/community/sc/myrtle-beach/toll-brothers-at-sayebrook",
+        "builder": "https://www.tollbrothers.com/luxury-homes-for-sale/South-Carolina/Toll-Brothers-at-SayeBrook"
       },
       "last_verified": "2026-10-05",
       "stale": false
