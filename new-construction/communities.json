@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-10-05T16:30:00Z",
+  "audit": {
+    "cadence": "nightly",
+    "rules": [
+      "Never write 0 for an unknown value; use null and the explorer renders 'Awaiting data'.",
+      "Never overwrite a known value with null on a failed fetch; keep last_verified and set stale=true after 7 days.",
+      "Log every material change (starting price move >= $5,000, QMI count change, incentive added/removed, status change) to audit-log.json."
+    ]
+  },
+  "communities": [
+    {
+      "id": "crown-pointe",
+      "name": "Crown Pointe",
+      "builder": "Meritage Homes",
+      "county": "Georgetown",
+      "city": "Georgetown",
+      "address": "158 Black Oak Rd, Georgetown, SC 29440",
+      "lat": 33.3904,
+      "lng": -79.3183,
+      "status": "selling",
+      "guide_url": "https://thesteel.group/explore-areas/georgetown/crown-pointe/",
+      "home_types": ["single-family"],
+      "starting_price": 299990,
+      "price_max": 374990,
+      "sqft_min": 1542,
+      "sqft_max": 2001,
+      "beds_min": 3,
+      "beds_max": 4,
+      "total_homesites": null,
+      "remaining_runway": null,
+      "hoa_monthly": null,
+      "amenities": ["pool"],
+      "features": {
+        "age_55_plus": false,
+        "gated": false,
+        "pool": true,
+        "golf": false,
+        "waterfront": false
+      },
+      "move_timing": ["now", "0-90", "plan"],
+      "quick_move_ins": { "count": 9, "price_min": 299990, "price_max": 354990 },
+      "incentives": null,
+      "floor_plans": [
+        { "name": "Buchanan", "sqft": 1542, "beds": 3, "baths": 2, "base_price": 299990, "stories": 1 },
+        { "name": "Chandler", "sqft": 1648, "beds": 3, "baths": 2, "base_price": 309990, "stories": 1 },
+        { "name": "Newport", "sqft": 1835, "beds": 4, "baths": 2, "base_price": 324990, "stories": 1 },
+        { "name": "Gibson", "sqft": 2001, "beds": 4, "baths": 3, "base_price": 339990, "stories": 1 },
+        { "name": "Finley", "sqft": null, "beds": null, "baths": null, "base_price": null, "stories": null },
+        { "name": "Zimmerman", "sqft": null, "beds": null, "baths": null, "base_price": null, "stories": null }
+      ],
+      "schools": {
+        "district": "Georgetown County School District",
+        "elementary": "Kensington Elementary",
+        "middle": "Georgetown Middle",
+        "high": "Georgetown High",
+        "source_url": "https://www.gcsd.k12.sc.us/"
+      },
+      "mls_subdivision": "Crown Pointe",
+      "sources": {
+        "primary": "https://www.newhomesource.com/community/sc/georgetown/crown-pointe-by-meritage-homes/223002",
+        "builder": "https://www.meritagehomes.com/state/sc/myrtle-beach/crown-pointe"
+      },
+      "last_verified": "2026-10-05",
+      "stale": false
+    }
+  ]
+}

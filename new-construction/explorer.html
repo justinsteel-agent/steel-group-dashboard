@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New Construction Explorer</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+  :root{--paper:#F7F4EE;--ink:#1B2233;--brass:#B08D57;--rule:#E3DED4;--muted:#6B7280;--white:#fff}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "Helvetica Neue",Arial,sans-serif}
+  h1,h2,h3,.serif{font-family:Baskerville,"Iowan Old Style","Times New Roman",serif;font-weight:400;letter-spacing:.01em}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 16px}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0;border-bottom:1px solid var(--rule)}
+  .filters select,.filters button{background:var(--white);border:1px solid var(--rule);color:var(--ink);padding:8px 10px;border-radius:4px;font:inherit;font-size:13px}
+  .filters button{cursor:pointer}
+  .filters .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{border:1px solid var(--rule);background:var(--white);padding:6px 10px;border-radius:999px;font-size:12px;cursor:pointer;user-select:none}
+  .chip.on{border-color:var(--brass);background:var(--brass);color:#fff}
+  .count{margin-left:auto;font-size:12px;color:var(--muted);align-self:center}
+  .layout{display:grid;grid-template-columns:1fr 420px;gap:16px;padding:16px 0}
+  #map{height:620px;border:1px solid var(--rule);border-radius:6px;background:#eee}
+  .cards{display:flex;flex-direction:column;gap:12px;max-height:620px;overflow:auto;padding-right:4px}
+  .card{background:var(--white);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;transition:border-color .15s}
+  .card.active{border-color:var(--brass);box-shadow:0 0 0 2px rgba(176,141,87,.25)}
+  .card h3{margin:0 0 2px;font-size:20px}
+  .card .sub{color:var(--muted);font-size:12px;margin-bottom:8px}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:13px;margin:8px 0}
+  .facts b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .badge{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);border:1px solid var(--brass);padding:2px 7px;border-radius:3px;margin-right:4px}
+  .actions{display:flex;gap:8px;margin-top:10px}
+  .btn{flex:1;text-align:center;text-decoration:none;padding:9px 10px;border-radius:4px;font-size:13px;border:1px solid var(--ink);color:var(--ink);background:var(--white)}
+  .btn.primary{background:var(--ink);color:#fff}
+  .btn.primary:hover{background:var(--brass);border-color:var(--brass)}
+  .verified{font-size:11px;color:var(--muted);margin-top:8px}
+  .empty{padding:40px;text-align:center;color:var(--muted)}
+  .maplibregl-popup-content{font:13px/1.4 "Helvetica Neue",Arial,sans-serif;color:var(--ink);padding:10px 12px}
+  .pin{width:14px;height:14px;border-radius:50%;background:var(--brass);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);cursor:pointer}
+  .pin.active{background:var(--ink);transform:scale(1.3)}
+  @media (max-width:900px){.layout{grid-template-columns:1fr}#map{height:380px}.cards{max-height:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="filters" id="filters">
+    <select id="f-county"><option value="">All counties</option><option>Horry</option><option>Georgetown</option></select>
+    <select id="f-price"><option value="">Any price</option><option value="0-300000">Under $300K</option><option value="300000-400000">$300K–$400K</option><option value="400000-500000">$400K–$500K</option><option value="500000-750000">$500K–$750K</option><option value="750000-99999999">$750K+</option></select>
+    <select id="f-builder"><option value="">All builders</option></select>
+    <select id="f-type"><option value="">All home types</option><option value="single-family">Single-family</option><option value="townhome">Townhome</option></select>
+    <select id="f-timing"><option value="">Any move timing</option><option value="now">Available now</option><option value="0-90">0–90 days</option><option value="3-6">3–6 months</option><option value="plan">Build from a plan</option></select>
+    <select id="f-district"><option value="">Any school district</option></select>
+    <div class="chips" id="chips">
+      <span class="chip" data-f="age_55_plus">55+</span><span class="chip" data-f="gated">Gated</span><span class="chip" data-f="pool">Pool</span><span class="chip" data-f="golf">Golf</span><span class="chip" data-f="waterfront">Waterfront</span>
+    </div>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="layout">
+    <div id="map"></div>
+    <div class="cards" id="cards"></div>
+  </div>
+</div>
+<script>
+(async function(){
+  const DATA_URL = (new URLSearchParams(location.search).get('data')) || 'communities.json';
+  const fmt = n => n==null ? 'Awaiting data' : '$'+Number(n).toLocaleString();
+  const txt = v => (v==null||v==='') ? 'Awaiting data' : v;
+  const res = await fetch(DATA_URL+'?v='+Date.now()); const db = await res.json();
+  const all = db.communities.filter(c=>c.status!=='closed');
+  const builders=[...new Set(all.map(c=>c.builder))].sort(); const districts=[...new Set(all.map(c=>c.schools&&c.schools.district).filter(Boolean))].sort();
+  for(const b of builders) document.getElementById('f-builder').insertAdjacentHTML('beforeend',`<option>${b}</option>`);
+  for(const d of districts) document.getElementById('f-district').insertAdjacentHTML('beforeend',`<option>${d}</option>`);
+  const map = new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/positron',center:[-79.05,33.6],zoom:9,attributionControl:true});
+  map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+  let markers=[]; let activeId=null;
+  const state={county:'',price:'',builder:'',type:'',timing:'',district:'',chips:new Set()};
+  document.querySelectorAll('#filters select').forEach(s=>s.addEventListener('change',()=>{state[s.id.slice(2)]=s.value;render()}));
+  document.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{ch.classList.toggle('on');const f=ch.dataset.f;state.chips.has(f)?state.chips.delete(f):state.chips.add(f);render()}));
+  function pass(c){
+    if(state.county&&c.county!==state.county)return false;
+    if(state.builder&&c.builder!==state.builder)return false;
+    if(state.type&&!(c.home_types||[]).includes(state.type))return false;
+    if(state.timing&&!(c.move_timing||[]).includes(state.timing))return false;
+    if(state.district&&(!c.schools||c.schools.district!==state.district))return false;
+    if(state.price){const [lo,hi]=state.price.split('-').map(Number);const p=c.starting_price;if(p==null||p<lo||p>hi)return false}
+    for(const f of state.chips){if(!(c.features&&c.features[f]))return false}
+    return true;
+  }
+  function card(c){
+    const q=c.quick_move_ins||{};const fp=(c.floor_plans||[]).filter(p=>p.sqft);const stale=c.stale?' · <span style="color:#b45309">verification pending</span>':'';
+    return `<div class="card" id="card-${c.id}" data-id="${c.id}">
+      <h3>${c.name}</h3>
+      <div class="sub">${c.builder} · ${c.city}, ${c.county} County</div>
+      ${(c.home_types||[]).map(t=>`<span class="badge">${t.replace('-',' ')}</span>`).join('')}${c.features&&c.features.age_55_plus?'<span class="badge">55+</span>':''}
+      <div class="facts">
+        <div><b>From</b>${fmt(c.starting_price)}</div>
+        <div><b>Size</b>${c.sqft_min?`${c.sqft_min.toLocaleString()}–${(c.sqft_max||c.sqft_min).toLocaleString()} sq ft`:'Awaiting data'}</div>
+        <div><b>Beds</b>${c.beds_min?`${c.beds_min}–${c.beds_max||c.beds_min}`:'Awaiting data'}</div>
+        <div><b>Floor plans</b>${fp.length?fp.length+(c.floor_plans.length>fp.length?'+':''):'Awaiting data'}</div>
+        <div><b>Ready now</b>${q.count==null?'Awaiting data':q.count+(q.price_min?` · ${fmt(q.price_min)}+`:'')}</div>
+        <div><b>HOA</b>${c.hoa_monthly==null?'Awaiting data':'$'+c.hoa_monthly+'/mo'}</div>
+        <div style="grid-column:1/-1"><b>Schools</b>${c.schools?`${txt(c.schools.elementary)} · ${txt(c.schools.middle)} · ${txt(c.schools.high)}`:'Awaiting data'}</div>
+      </div>
+      <div class="actions">
+        <a class="btn" href="${c.guide_url}" target="_top">Community guide</a>
+        <a class="btn primary" href="${c.guide_url}#tour" target="_top">Tour with representation</a>
+      </div>
+      <div class="verified">Last verified ${c.last_verified||'—'}${stale}</div>
+    </div>`;
+  }
+  function render(){
+    const list=all.filter(pass);
+    document.getElementById('count').textContent=`${list.length} communit${list.length===1?'y':'ies'}`;
+    const el=document.getElementById('cards');
+    el.innerHTML=list.length?list.map(card).join(''):'<div class="empty">No communities match these filters yet. More are added weekly.</div>';
+    markers.forEach(m=>m.remove());markers=[];
+    const b=new maplibregl.LngLatBounds();
+    list.forEach(c=>{if(c.lat==null)return;const d=document.createElement('div');d.className='pin';d.dataset.id=c.id;
+      const m=new maplibregl.Marker({element:d}).setLngLat([c.lng,c.lat]).setPopup(new maplibregl.Popup({offset:12,closeButton:false}).setHTML(`<strong>${c.name}</strong><br>${c.builder}<br>From ${fmt(c.starting_price)}`)).addTo(map);
+      d.addEventListener('click',()=>focus(c.id));markers.push(m);b.extend([c.lng,c.lat])});
+    if(list.length>1)map.fitBounds(b,{padding:60,maxZoom:12});else if(list.length===1)map.flyTo({center:[list[0].lng,list[0].lat],zoom:12});
+    el.querySelectorAll('.card').forEach(k=>k.addEventListener('mouseenter',()=>focus(k.dataset.id,false)));
+  }
+  function focus(id,scroll=true){activeId=id;document.querySelectorAll('.card').forEach(k=>k.classList.toggle('active',k.dataset.id===id));document.querySelectorAll('.pin').forEach(p=>p.classList.toggle('active',p.dataset.id===id));
+    if(scroll){const k=document.getElementById('card-'+id);k&&k.scrollIntoView({behavior:'smooth',block:'nearest'})}}
+  map.on('load',render);
+  // let the parent page size the iframe
+  const post=()=>{try{parent.postMessage({ncExplorerHeight:document.body.scrollHeight},'*')}catch(e){}};
+  new ResizeObserver(post).observe(document.body);
+})();
+</script>
+</body>
+</html>
