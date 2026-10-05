@@ -124,7 +124,8 @@
   }
   function focus(id,scroll=true){activeId=id;document.querySelectorAll('.card').forEach(k=>k.classList.toggle('active',k.dataset.id===id));document.querySelectorAll('.pin').forEach(p=>p.classList.toggle('active',p.dataset.id===id));
     if(scroll){const k=document.getElementById('card-'+id);k&&k.scrollIntoView({behavior:'smooth',block:'nearest'})}}
-  map.on('load',render);
+  render();
+  map.on('error',e=>console.warn('map error',e&&e.error&&e.error.message));
   // let the parent page size the iframe
   const post=()=>{try{parent.postMessage({ncExplorerHeight:document.body.scrollHeight},'*')}catch(e){}};
   new ResizeObserver(post).observe(document.body);
