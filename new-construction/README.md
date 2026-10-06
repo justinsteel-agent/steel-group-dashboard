@@ -7,6 +7,9 @@
 Served from GitHub Pages: `https://justinsteel-agent.github.io/steel-group-dashboard/new-construction/`.
 
 - `SHOT-LIST.md` — the 7 photo slots every community gets; `media.<slot>` in `communities.json` holds the URL once a mission delivers it.
+- `call-rotation.json` — Justin's daily call list (5 neighborhoods/weekday, Horry + Georgetown County **South Carolina** only). The nightly audit advances `cursor` and creates the next day's SureSend task. Unverified entries are promoted into `communities.json` only after a call or a verified fetch.
+
+Companion systems (not in this repo): SureSend tags `VENDOR-New Construction` + `BUILDER-<name>`, builder Company records, the "New Construction – On-Site Rep Intake" automation, and the Google Drive folder "New Construction Community Database (SC)" (sheet + per-community Handouts folders).
 
 ## Rules the audit must follow
 1. Unknown is `null`, rendered as "Awaiting data". Never 0.
