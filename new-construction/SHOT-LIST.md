@@ -1,6 +1,6 @@
 # Community Visit Standard — New Construction
 
-One visit, one checklist, every community. Nothing on this list is optional. Everything is shot on a phone, held level, horizontal for web, vertical for social. Upload everything to the mission folder `01 — Raw Uploads`; the Mission Report maps files to slots.
+One visit, one checklist, every community. Nothing on this list is optional. Everything is shot on a phone, held level, and horizontal — always. Vertical and square cuts are made in post; keep the subject centered so the 9:16 crop holds. Upload everything to the mission folder `01 — Raw Uploads`; the Mission Report maps files to slots.
 
 ## A. Web shots (horizontal) — fill the community page and explorer card
 
@@ -15,22 +15,22 @@ One visit, one checklist, every community. Nothing on this list is optional. Eve
 | `context` | What's next door — the drive in, nearest shopping, water, highway. Honest. | 3:2 | Gallery tile 6 / "Things buyers should consider" |
 | `plan_<name>` (optional) | Each floor-plan sheet from the sales center, flat, no glare | 4:3 | Floorplans block |
 
-## B. Social shots (vertical 9:16 unless noted) — fill the week's content
+## B. Social shots (shot horizontal 16:9, subject centered; cut to 9:16, 4:5 or 1:1 in post) — fill the week's content
 
 | Slot | Shot | Length / crop | Use |
 |---|---|---|---|
-| `v_hook` | You at the entrance sign, one line: "[Community], [City] — here's what the sales center won't tell you." | 5–8 s, 9:16 | Reel/Short/TikTok opener |
-| `v_walk` | Walk-and-talk through one street: price point, who it's for, the one thing you'd check | 45–75 s, 9:16, continuous | Main Reel; transcript → article |
-| `v_model` | Model interior walkthrough, slow pan, no talking | 20–30 s, 9:16 | B-roll / second Reel |
-| `v_amenity` | Amenity pan | 8–12 s, 9:16 | B-roll |
-| `v_lots` | Phase under construction, pan to finished street | 8–12 s, 9:16 | B-roll / "runway" talking point |
-| `v_context` | Drive-in or next-door reality | 8–12 s, 9:16 | B-roll / consideration |
-| `v_cta` | You, close, one line: "Tell the sales center you're with The Steel Group before you tour — representation costs you nothing." | 5–8 s, 9:16 | Every Reel's last shot |
+| `v_hook` | You at the entrance sign, one line: "[Community], [City] — here's what the sales center won't tell you." | 5–8 s, 16:9 → 9:16 in post | Reel/Short/TikTok opener |
+| `v_walk` | Walk-and-talk through one street: price point, who it's for, the one thing you'd check | 45–75 s, 16:9 → 9:16 in post, continuous | Main Reel; transcript → article |
+| `v_model` | Model interior walkthrough, slow pan, no talking | 20–30 s, 16:9 → 9:16 in post | B-roll / second Reel |
+| `v_amenity` | Amenity pan | 8–12 s, 16:9 → 9:16 in post | B-roll |
+| `v_lots` | Phase under construction, pan to finished street | 8–12 s, 16:9 → 9:16 in post | B-roll / "runway" talking point |
+| `v_context` | Drive-in or next-door reality | 8–12 s, 16:9 → 9:16 in post | B-roll / consideration |
+| `v_cta` | You, close, one line: "Tell the sales center you're with The Steel Group before you tour — representation costs you nothing." | 5–8 s, 16:9 → 9:16 in post | Every Reel's last shot |
 | `s_feed` | Best still of the visit, reframed | 4:5 | Instagram/Facebook feed |
 | `s_carousel` | 3 stills: entrance, streetscape, interior | 1:1 | Carousel; also Google Business Profile post |
-| `s_cover` | Hero reframed with room for a title | 9:16 | Reel cover / story |
+| `s_cover` | Hero reframed with room for a title | 9:16, cropped in post | Reel cover / story |
 
-Phone settings: 4K/30 for video, HDR off, lock exposure on the subject. Hold the phone at chest height. Say the community name and city on camera at least once.
+Phone settings: horizontal only, 4K/30 for video, HDR off, lock exposure on the subject. Hold the phone at chest height. Say the community name and city on camera at least once.
 
 ## C. Talking points to capture on camera (any clip)
 1. Starting price and what that buys (plan, sq ft).
