@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-10-05T16:30:00Z",
+  "updated_at": "2026-10-06T01:04:15Z",
   "audit": {
     "cadence": "nightly",
     "rules": [
@@ -178,7 +178,7 @@
         "price_min": 559000,
         "price_max": 559000
       },
-      "incentives": null,
+      "incentives": "$40,000 Flex Cash to Use Your Way + $10,000 in Closing Costs with Toll Brothers Mortgage Company",
       "floor_plans": [
         {
           "name": "Hayleigh",
@@ -273,7 +273,7 @@
         "primary": "https://www.newhomesource.com/community/sc/myrtle-beach/toll-brothers-at-sayebrook",
         "builder": "https://www.tollbrothers.com/luxury-homes-for-sale/South-Carolina/Toll-Brothers-at-SayeBrook"
       },
-      "last_verified": "2026-10-05",
+      "last_verified": "2026-10-06",
       "stale": false,
       "media": {
         "hero": null,

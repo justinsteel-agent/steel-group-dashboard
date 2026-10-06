@@ -1,1 +1,36 @@
-{"entries":[]}
+{
+  "entries": [
+    {
+      "date": "2026-10-06",
+      "community_id": "crown-pointe",
+      "field": "fetch",
+      "old": null,
+      "new": "failed",
+      "source": "https://www.newhomesource.com/community/sc/georgetown/crown-pointe-by-meritage-homes/223002"
+    },
+    {
+      "date": "2026-10-06",
+      "community_id": "crown-pointe",
+      "field": "fetch",
+      "old": null,
+      "new": "failed",
+      "source": "https://www.meritagehomes.com/state/sc/myrtle-beach/crown-pointe"
+    },
+    {
+      "date": "2026-10-06",
+      "community_id": "toll-brothers-at-sayebrook",
+      "field": "fetch",
+      "old": null,
+      "new": "failed",
+      "source": "https://www.newhomesource.com/community/sc/myrtle-beach/toll-brothers-at-sayebrook"
+    },
+    {
+      "date": "2026-10-06",
+      "community_id": "toll-brothers-at-sayebrook",
+      "field": "incentives",
+      "old": null,
+      "new": "$40,000 Flex Cash to Use Your Way + $10,000 in Closing Costs with Toll Brothers Mortgage Company",
+      "source": "https://www.tollbrothers.com/luxury-homes-for-sale/South-Carolina/Toll-Brothers-at-SayeBrook"
+    }
+  ]
+}
