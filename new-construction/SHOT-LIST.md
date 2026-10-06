@@ -20,7 +20,7 @@ One visit, one checklist, every community. Nothing on this list is optional. Eve
 | Slot | Shot | Length / crop | Use |
 |---|---|---|---|
 | `v_hook` | You at the entrance sign, one line: "[Community], [City] — here's what the sales center won't tell you." | 5–8 s, 16:9 → 9:16 in post | Reel/Short/TikTok opener |
-| `v_walk` | Walk-and-talk through one street: price point, who it's for, the one thing you'd check | 45–75 s, 16:9 → 9:16 in post, continuous | Main Reel; transcript → article |
+| `v_walk` | Walk-and-talk through one street: price point, who it's for, the one thing you'd check | 60–90 s, 16:9 → 9:16 in post, continuous | Main Reel; transcript → article |
 | `v_model` | Model interior walkthrough, slow pan, no talking | 20–30 s, 16:9 → 9:16 in post | B-roll / second Reel |
 | `v_amenity` | Amenity pan | 8–12 s, 16:9 → 9:16 in post | B-roll |
 | `v_lots` | Phase under construction, pan to finished street | 8–12 s, 16:9 → 9:16 in post | B-roll / "runway" talking point |
@@ -30,7 +30,13 @@ One visit, one checklist, every community. Nothing on this list is optional. Eve
 | `s_carousel` | 3 stills: entrance, streetscape, interior | 1:1 | Carousel; also Google Business Profile post |
 | `s_cover` | Hero reframed with room for a title | 9:16, cropped in post | Reel cover / story |
 
-Phone settings: horizontal only, 4K/30 for video, HDR off, lock exposure on the subject. Hold the phone at chest height. Say the community name and city on camera at least once.
+## Format rules (from Metricool's publishing limits for our six channels: Facebook, Instagram, Pinterest, TikTok, Google Business Profile, YouTube — checked Oct 6, 2026)
+- Shoot horizontal 4K/30, always. Reels, Shorts, TikTok and video pins want 1080×1920 (9:16); a 4K frame cut to 9:16 is 1215×2160, so it holds. A 1080p frame cut to 9:16 is 608×1080 — too soft. Never shoot 1080p.
+- Keep the subject in the middle third of the frame. A 9:16 cut keeps only the center ~32% of the width.
+- Stills at full sensor (4:3). Post crops: 4:5 Instagram feed (1080×1350), 2:3 Pinterest pin (1000×1500), 1:1 carousel, 9:16 story/cover.
+- Lengths: at least one clip under 30 s (Google Business video cap, 75 MB). The main piece (v_walk) runs 60–90 s: YouTube long-form needs 60+ s, Facebook Reels cap at 90 s.
+
+Phone settings: HDR off, lock exposure on the subject. Hold the phone at chest height. Say the community name and city on camera at least once.
 
 ## C. Talking points to capture on camera (any clip)
 1. Starting price and what that buys (plan, sq ft).
